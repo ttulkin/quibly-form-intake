@@ -5,7 +5,7 @@ import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import Index from '@/pages/Index';
 import { supabase } from "@/integrations/supabase/client";
-import { ToastProvider } from "@/hooks/use-toast";
+import { ToastProvider } from "@/components/ui/toast"; // Fixed import path
 
 // Mock supabase client
 vi.mock("@/integrations/supabase/client", () => {

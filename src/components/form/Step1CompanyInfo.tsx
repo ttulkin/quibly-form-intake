@@ -21,6 +21,31 @@ interface Step1Props {
 const Step1CompanyInfo = ({ formData, updateFormData, onNext }: Step1Props) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  // Helper function to format website URL
+  const formatWebsiteUrl = (url: string): string => {
+    if (!url) return "";
+    
+    // Add https:// prefix if not present and URL is not empty
+    if (!url.match(/^https?:\/\//i) && url.trim() !== "") {
+      return `https://${url}`;
+    }
+    
+    return url;
+  };
+
+  // Handle website input change with auto-formatting
+  const handleWebsiteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    // Only format when user stops typing (on blur)
+    updateFormData({ companyWebsite: inputValue });
+  };
+
+  // Format URL on blur
+  const handleWebsiteBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const formattedUrl = formatWebsiteUrl(e.target.value);
+    updateFormData({ companyWebsite: formattedUrl });
+  };
+
   const validate = () => {
     const newErrors: Record<string, string> = {};
     
@@ -28,8 +53,14 @@ const Step1CompanyInfo = ({ formData, updateFormData, onNext }: Step1Props) => {
     
     if (!formData.companyWebsite.trim()) {
       newErrors.companyWebsite = "Company website is required";
-    } else if (!/^https?:\/\/(?:www\.)?[a-zA-Z0-9-]+(?:\.[a-zA-Z]+)+[\/\w\.-]*$/.test(formData.companyWebsite)) {
-      newErrors.companyWebsite = "Please enter a valid URL";
+    } else {
+      // Format URL for validation
+      const formattedUrl = formatWebsiteUrl(formData.companyWebsite);
+      
+      // Validate URL format - more permissive pattern
+      if (!/^https?:\/\/(?:www\.)?[\w-]+(\.[\w-]+)+(?:[\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?$/.test(formattedUrl)) {
+        newErrors.companyWebsite = "Please enter a valid website address";
+      }
     }
     
     if (!formData.contactName.trim()) newErrors.contactName = "Contact name is required";
@@ -42,7 +73,8 @@ const Step1CompanyInfo = ({ formData, updateFormData, onNext }: Step1Props) => {
     
     if (!formData.role.trim()) newErrors.role = "Role/Title is required";
     if (!formData.companySize) newErrors.companySize = "Company size is required";
-    if (!formData.timeZoneOverlap) newErrors.timeZoneOverlap = "Time zone overlap is required";
+    if (!formData.timeZoneRegion) newErrors.timeZoneRegion = "Time zone region is required";
+    if (!formData.timeZoneOverlap) newErrors.timeZoneOverlap = "Time zone overlap preference is required";
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -50,6 +82,11 @@ const Step1CompanyInfo = ({ formData, updateFormData, onNext }: Step1Props) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Format website URL before validation
+    const formattedUrl = formatWebsiteUrl(formData.companyWebsite);
+    updateFormData({ companyWebsite: formattedUrl });
+    
     if (validate()) {
       onNext();
     }
@@ -75,10 +112,10 @@ const Step1CompanyInfo = ({ formData, updateFormData, onNext }: Step1Props) => {
         <FormField label="Company Website" required error={errors.companyWebsite}>
           <Input
             value={formData.companyWebsite}
-            onChange={(e) => updateFormData({ companyWebsite: e.target.value })}
-            placeholder="https://acme.com"
+            onChange={handleWebsiteChange}
+            onBlur={handleWebsiteBlur}
+            placeholder="yourdomain.com"
             className="w-full"
-            type="url"
           />
         </FormField>
 
@@ -127,17 +164,38 @@ const Step1CompanyInfo = ({ formData, updateFormData, onNext }: Step1Props) => {
           </Select>
         </FormField>
 
-        <FormField label="Time Zone Overlap" required error={errors.timeZoneOverlap} className="md:col-span-2">
+        <FormField label="Time Zone Region" required error={errors.timeZoneRegion}>
+          <Select 
+            value={formData.timeZoneRegion}
+            onValueChange={(value) => updateFormData({ timeZoneRegion: value })}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select your primary time zone" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="US Eastern">US Eastern (EST/EDT, UTC-5/4)</SelectItem>
+              <SelectItem value="US Central">US Central (CST/CDT, UTC-6/5)</SelectItem>
+              <SelectItem value="US Mountain">US Mountain (MST/MDT, UTC-7/6)</SelectItem>
+              <SelectItem value="US Pacific">US Pacific (PST/PDT, UTC-8/7)</SelectItem>
+              <SelectItem value="UK/Ireland">UK/Ireland (GMT/BST, UTC+0/1)</SelectItem>
+              <SelectItem value="Central Europe">Central Europe (CET/CEST, UTC+1/2)</SelectItem>
+              <SelectItem value="Eastern Europe">Eastern Europe (EET/EEST, UTC+2/3)</SelectItem>
+              <SelectItem value="Other">Other</SelectItem>
+            </SelectContent>
+          </Select>
+        </FormField>
+
+        <FormField label="Time Zone Overlap Preference" required error={errors.timeZoneOverlap}>
           <Select 
             value={formData.timeZoneOverlap}
             onValueChange={(value) => updateFormData({ timeZoneOverlap: value })}
           >
             <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select preferred time zone overlap" />
+              <SelectValue placeholder="Select overlap preference" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="Full US hours">Full US hours</SelectItem>
-              <SelectItem value="Partial US hours">Partial US hours</SelectItem>
+              <SelectItem value="Full overlap">Full overlap with my time zone</SelectItem>
+              <SelectItem value="Partial overlap">Partial overlap is sufficient</SelectItem>
               <SelectItem value="No preference">No preference</SelectItem>
             </SelectContent>
           </Select>

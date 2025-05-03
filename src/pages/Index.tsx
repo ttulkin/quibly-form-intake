@@ -18,6 +18,7 @@ const Index = () => {
     workEmail: "",
     role: "",
     companySize: "",
+    timeZoneRegion: "", // New field for time zone region
     timeZoneOverlap: "",
     
     // Step 2: Developer Role(s) Needed

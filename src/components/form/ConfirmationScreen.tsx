@@ -10,11 +10,11 @@ const ConfirmationScreen = () => {
       </div>
       
       <h2 className="text-3xl font-bold text-center text-gray-900 mb-4">
-        Thanks for Your Request!
+        🎉 You're In!
       </h2>
       
       <p className="text-lg text-gray-600 text-center mb-6 max-w-lg">
-        We'll match you with the perfect developers for your project. A member of our team will be in touch within 24 hours.
+        We're spinning up your match. A real human will reach out in the next 24 hours with next steps.
       </p>
       
       <div className="grid gap-4 w-full max-w-md">
@@ -23,15 +23,15 @@ const ConfirmationScreen = () => {
           <ul className="space-y-3">
             <li className="flex items-start">
               <ArrowRight size={18} className="text-primary mr-2 mt-0.5 flex-shrink-0" />
-              <span className="text-gray-600">Our team will review your requirements</span>
+              <span className="text-gray-600">We'll review your request</span>
             </li>
             <li className="flex items-start">
               <ArrowRight size={18} className="text-primary mr-2 mt-0.5 flex-shrink-0" />
-              <span className="text-gray-600">We'll schedule a brief call to discuss your needs</span>
+              <span className="text-gray-600">Hop on a quick call to align</span>
             </li>
             <li className="flex items-start">
               <ArrowRight size={18} className="text-primary mr-2 mt-0.5 flex-shrink-0" />
-              <span className="text-gray-600">You'll receive a shortlist of pre-vetted candidates</span>
+              <span className="text-gray-600">Get a curated shortlist of pre-vetted, startup-ready engineers</span>
             </li>
           </ul>
         </div>
@@ -40,7 +40,7 @@ const ConfirmationScreen = () => {
           className="w-full"
           onClick={() => window.location.href = "/"}
         >
-          Return to Home
+          🏠 Back to Quibly HQ
         </Button>
       </div>
     </div>

@@ -16,9 +16,6 @@ const StepIndicator = ({ currentStep, totalSteps }: StepIndicatorProps) => {
   return (
     <nav aria-label="Progress" className="mb-8">
       <ol className="flex items-center justify-between w-full relative">
-        {/* Progress bar background - positioned below the steps */}
-        <div className="absolute top-6 left-0 w-full h-0.5 bg-gray-200 z-0"></div>
-        
         {/* Active progress bar - dynamically sized based on current step */}
         <div 
           className="absolute top-6 left-0 h-0.5 bg-primary z-0 transition-all duration-300 ease-in-out"

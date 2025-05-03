@@ -9,7 +9,182 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      company_requests: {
+        Row: {
+          company_name: string
+          company_size: string | null
+          company_website: string | null
+          contact_name: string
+          created_at: string
+          estimated_duration: string | null
+          id: string
+          is_asap: boolean | null
+          monthly_budget: string | null
+          notes: string | null
+          role: string | null
+          start_date: string | null
+          status: string
+          time_zone_overlap: string | null
+          time_zone_region: string | null
+          updated_at: string
+          user_id: string | null
+          weekly_hours: string | null
+          work_email: string
+        }
+        Insert: {
+          company_name: string
+          company_size?: string | null
+          company_website?: string | null
+          contact_name: string
+          created_at?: string
+          estimated_duration?: string | null
+          id?: string
+          is_asap?: boolean | null
+          monthly_budget?: string | null
+          notes?: string | null
+          role?: string | null
+          start_date?: string | null
+          status?: string
+          time_zone_overlap?: string | null
+          time_zone_region?: string | null
+          updated_at?: string
+          user_id?: string | null
+          weekly_hours?: string | null
+          work_email: string
+        }
+        Update: {
+          company_name?: string
+          company_size?: string | null
+          company_website?: string | null
+          contact_name?: string
+          created_at?: string
+          estimated_duration?: string | null
+          id?: string
+          is_asap?: boolean | null
+          monthly_budget?: string | null
+          notes?: string | null
+          role?: string | null
+          start_date?: string | null
+          status?: string
+          time_zone_overlap?: string | null
+          time_zone_region?: string | null
+          updated_at?: string
+          user_id?: string | null
+          weekly_hours?: string | null
+          work_email?: string
+        }
+        Relationships: []
+      }
+      developer_roles: {
+        Row: {
+          created_at: string
+          id: string
+          job_description: string | null
+          nice_to_have_skills: string | null
+          number_of_developers: number | null
+          preferred_languages: Json | null
+          request_id: string
+          required_tech_stack: Json | null
+          role_title: string | null
+          seniority_level: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          job_description?: string | null
+          nice_to_have_skills?: string | null
+          number_of_developers?: number | null
+          preferred_languages?: Json | null
+          request_id: string
+          required_tech_stack?: Json | null
+          role_title?: string | null
+          seniority_level?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          job_description?: string | null
+          nice_to_have_skills?: string | null
+          number_of_developers?: number | null
+          preferred_languages?: Json | null
+          request_id?: string
+          required_tech_stack?: Json | null
+          role_title?: string | null
+          seniority_level?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "developer_roles_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "company_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      matched_developers: {
+        Row: {
+          created_at: string
+          developer_name: string
+          developer_skills: Json | null
+          hourly_rate: number | null
+          id: string
+          notes: string | null
+          request_id: string
+          role_id: string | null
+          seniority_level: string | null
+          start_date: string | null
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          developer_name: string
+          developer_skills?: Json | null
+          hourly_rate?: number | null
+          id?: string
+          notes?: string | null
+          request_id: string
+          role_id?: string | null
+          seniority_level?: string | null
+          start_date?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          developer_name?: string
+          developer_skills?: Json | null
+          hourly_rate?: number | null
+          id?: string
+          notes?: string | null
+          request_id?: string
+          role_id?: string | null
+          seniority_level?: string | null
+          start_date?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matched_developers_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "company_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matched_developers_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "developer_roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import FormContainer from "@/components/form/FormContainer";
 import Step1CompanyInfo from "@/components/form/Step1CompanyInfo";
 import Step2DeveloperRoles from "@/components/form/Step2DeveloperRoles";
@@ -7,9 +8,15 @@ import Step3BudgetTimeline from "@/components/form/Step3BudgetTimeline";
 import ConfirmationScreen from "@/components/form/ConfirmationScreen";
 import StepIndicator from "@/components/form/StepIndicator";
 import { FormData } from "@/types/form";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 const Index = () => {
   const [currentStep, setCurrentStep] = useState(0);
+  const [submitting, setSubmitting] = useState(false);
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  
   const [formData, setFormData] = useState<FormData>({
     // Step 1: Company & Contact Info
     companyName: "",
@@ -57,10 +64,82 @@ const Index = () => {
     setCurrentStep(prev => Math.max(prev - 1, 0));
   };
 
-  const handleSubmit = () => {
-    // This would be replaced with API call to backend
-    console.log("Form submitted:", formData);
-    nextStep();
+  const handleSubmit = async () => {
+    setSubmitting(true);
+    try {
+      // First send magic link to user
+      const { error: authError } = await supabase.auth.signInWithOtp({
+        email: formData.workEmail,
+        options: {
+          emailRedirectTo: `${window.location.origin}/dashboard`,
+        },
+      });
+
+      if (authError) throw authError;
+
+      // Then insert the request
+      const { data: requestData, error: requestError } = await supabase
+        .from("company_requests")
+        .insert({
+          company_name: formData.companyName,
+          company_website: formData.companyWebsite,
+          contact_name: formData.contactName,
+          work_email: formData.workEmail,
+          role: formData.role,
+          company_size: formData.companySize,
+          time_zone_region: formData.timeZoneRegion,
+          time_zone_overlap: formData.timeZoneOverlap,
+          is_asap: formData.isASAP,
+          start_date: formData.startDate,
+          estimated_duration: formData.estimatedDuration,
+          weekly_hours: formData.weeklyHours,
+          monthly_budget: formData.monthlyBudget,
+          notes: formData.notes,
+        })
+        .select();
+
+      if (requestError) throw requestError;
+
+      // Insert developer roles
+      if (requestData && requestData.length > 0) {
+        const requestId = requestData[0].id;
+
+        // Map developer roles to the format for insertion
+        const developerRolesToInsert = formData.developerRoles.map(role => ({
+          request_id: requestId,
+          role_title: role.roleTitle,
+          required_tech_stack: role.requiredTechStack,
+          nice_to_have_skills: role.niceToHaveSkills,
+          seniority_level: role.seniorityLevel,
+          preferred_languages: role.preferredLanguages,
+          number_of_developers: role.numberOfDevelopers,
+          job_description: formData.hasJobDescription ? formData.jobDescription : null,
+        }));
+
+        const { error: rolesError } = await supabase
+          .from("developer_roles")
+          .insert(developerRolesToInsert);
+
+        if (rolesError) throw rolesError;
+      }
+
+      toast({
+        title: "Request Submitted Successfully!",
+        description: "We've sent you a magic link to access your dashboard.",
+        duration: 5000,
+      });
+
+      nextStep();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to submit your request",
+        variant: "destructive",
+        duration: 5000,
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const renderStep = () => {
@@ -89,10 +168,11 @@ const Index = () => {
             updateFormData={updateFormData}
             onNext={handleSubmit}
             onPrev={prevStep}
+            submitting={submitting}
           />
         );
       case 3:
-        return <ConfirmationScreen />;
+        return <ConfirmationScreen onViewDashboard={() => navigate("/login")} />;
       default:
         return null;
     }

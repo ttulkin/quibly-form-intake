@@ -68,6 +68,11 @@ const FormWizard = () => {
     try {
       await submitForm(formData);
       nextStep(); // Move to confirmation screen on success
+      toast({
+        title: "Request Submitted Successfully!",
+        description: "Check your email for a magic link to access your dashboard.",
+        duration: 6000,
+      });
     } catch (error: any) {
       console.error("Submission error:", error);
       toast({
@@ -109,7 +114,7 @@ const FormWizard = () => {
           />
         );
       case 3:
-        return <ConfirmationScreen onViewDashboard={() => navigate("/login")} />;
+        return <ConfirmationScreen onViewDashboard={() => navigate("/dashboard")} />;
       default:
         return null;
     }

@@ -83,7 +83,7 @@ export const useFormSubmission = () => {
 
       toast({
         title: "Request Submitted Successfully!",
-        description: "We've sent you a magic link to access your dashboard.",
+        description: "Check your email for a magic link to access your dashboard.",
         duration: 5000,
       });
 

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import FormContainer from "@/components/form/FormContainer";
@@ -67,7 +68,7 @@ const Index = () => {
     setSubmitting(true);
     try {
       // First send magic link to user
-      const { error: authError } = await supabase.auth.signInWithOtp({
+      const { error: authError, data: authData } = await supabase.auth.signInWithOtp({
         email: formData.workEmail,
         options: {
           emailRedirectTo: `${window.location.origin}/dashboard`,
@@ -76,7 +77,14 @@ const Index = () => {
 
       if (authError) throw authError;
 
-      // Convert Date object to ISO string for Supabase
+      // Get the current user's session 
+      const { data: sessionData } = await supabase.auth.getSession();
+      
+      // If no session exists, we need to create a temporary user ID to associate with the request
+      // This will be updated later when the user clicks the magic link
+      const userIdToUse = sessionData?.session?.user?.id || formData.workEmail;
+
+      // Prepare the request data
       const requestData = {
         company_name: formData.companyName,
         company_website: formData.companyWebsite,
@@ -93,9 +101,11 @@ const Index = () => {
         weekly_hours: formData.weeklyHours,
         monthly_budget: formData.monthlyBudget,
         notes: formData.notes,
+        // Critical: Add the user_id to comply with RLS policies
+        user_id: userIdToUse,
       };
 
-      // Then insert the request
+      // Now try to insert the request with user_id
       const { data: insertedRequestData, error: requestError } = await supabase
         .from("company_requests")
         .insert(requestData)
@@ -140,6 +150,7 @@ const Index = () => {
         variant: "destructive",
         duration: 5000,
       });
+      console.error("Submission error:", error);
     } finally {
       setSubmitting(false);
     }

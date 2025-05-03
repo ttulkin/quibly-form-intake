@@ -1,3 +1,4 @@
+
 import * as React from "react"
 import * as LabelPrimitive from "@radix-ui/react-label"
 import { Slot } from "@radix-ui/react-slot"
@@ -164,6 +165,26 @@ const FormMessage = React.forwardRef<
 })
 FormMessage.displayName = "FormMessage"
 
+// Export a helper function to handle form submission errors related to RLS
+const handleFormSubmissionError = (error: any) => {
+  // Check if the error is related to RLS policies
+  if (error.message && (
+    error.message.includes("row-level security") || 
+    error.message.includes("violates row-level security policy")
+  )) {
+    return {
+      title: "Authentication Error",
+      message: "You need to be signed in to submit this form. We'll send you a magic link to verify your email."
+    };
+  }
+  
+  // Handle other common errors
+  return {
+    title: "Submission Error",
+    message: error.message || "There was an error submitting your request. Please try again."
+  };
+};
+
 export {
   useFormField,
   Form,
@@ -173,4 +194,5 @@ export {
   FormDescription,
   FormMessage,
   FormField,
+  handleFormSubmissionError,
 }

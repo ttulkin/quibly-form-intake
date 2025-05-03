@@ -31,7 +31,7 @@ const techOptions = [
 ];
 
 const languageOptions = [
-  "English", "Spanish", "French", "German", "Portuguese", "Italian",
+  "Spanish", "French", "German", "Portuguese", "Italian",
   "Dutch", "Russian", "Mandarin", "Japanese", "Korean", "Arabic",
   "Hindi", "Bengali", "Polish", "Ukrainian", "Turkish", "Vietnamese"
 ];
@@ -115,7 +115,7 @@ const DeveloperRoleCard = ({
           />
         </FormField>
 
-        <FormField label="Preferred Spoken Languages" className="md:col-span-2">
+        <FormField label="Preferred Spoken Languages (Other Than English)" className="md:col-span-2">
           <MultiSelect 
             options={languageOptions}
             selected={role.preferredLanguages}

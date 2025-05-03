@@ -1,6 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { CheckCircle2 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface ConfirmationScreenProps {
   onViewDashboard?: () => void;
@@ -24,6 +25,7 @@ const ConfirmationScreen = ({ onViewDashboard }: ConfirmationScreenProps) => {
         <div className="bg-blue-50 p-4 rounded-md text-blue-800 text-sm mb-4">
           <p className="font-medium mb-2">Important:</p>
           <p>We've sent a <strong>magic link</strong> to your email. You <strong>must click this link</strong> to securely access your dashboard where you can track your request status.</p>
+          <p className="mt-2"><strong>Note:</strong> When clicking the magic link, you'll be redirected to the dashboard. If you're not seeing the dashboard, please manually navigate to /dashboard after clicking the link.</p>
         </div>
         <p className="text-sm text-gray-500">
           Don't see the email? Check your spam folder or try submitting again.

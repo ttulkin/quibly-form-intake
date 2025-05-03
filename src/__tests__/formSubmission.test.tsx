@@ -2,7 +2,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import { ToastProvider } from '@/components/ui/use-toast';
+import { ToastProvider } from "@/components/ui/toast";
 import Index from '@/pages/Index';
 import { supabase } from "@/integrations/supabase/client";
 

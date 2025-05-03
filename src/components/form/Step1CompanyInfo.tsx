@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/select";
 import { FormData } from "@/types/form";
 import FormField from "./FormField";
+import WebsiteField from "./inputs/WebsiteField";
+import { validateStep1 } from "@/utils/step1Validation";
 
 interface Step1Props {
   formData: FormData;
@@ -21,73 +23,13 @@ interface Step1Props {
 const Step1CompanyInfo = ({ formData, updateFormData, onNext }: Step1Props) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Helper function to format website URL
-  const formatWebsiteUrl = (url: string): string => {
-    if (!url) return "";
-    
-    // Add https:// prefix if not present and URL is not empty
-    if (!url.match(/^https?:\/\//i) && url.trim() !== "") {
-      return `https://${url}`;
-    }
-    
-    return url;
-  };
-
-  // Handle website input change with auto-formatting
-  const handleWebsiteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = e.target.value;
-    // Only format when user stops typing (on blur)
-    updateFormData({ companyWebsite: inputValue });
-  };
-
-  // Format URL on blur
-  const handleWebsiteBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    const formattedUrl = formatWebsiteUrl(e.target.value);
-    updateFormData({ companyWebsite: formattedUrl });
-  };
-
-  const validate = () => {
-    const newErrors: Record<string, string> = {};
-    
-    if (!formData.companyName.trim()) newErrors.companyName = "Company name is required";
-    
-    if (!formData.companyWebsite.trim()) {
-      newErrors.companyWebsite = "Company website is required";
-    } else {
-      // Format URL for validation
-      const formattedUrl = formatWebsiteUrl(formData.companyWebsite);
-      
-      // Validate URL format - more permissive pattern
-      if (!/^https?:\/\/(?:www\.)?[\w-]+(\.[\w-]+)+(?:[\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?$/.test(formattedUrl)) {
-        newErrors.companyWebsite = "Please enter a valid website address";
-      }
-    }
-    
-    if (!formData.contactName.trim()) newErrors.contactName = "Contact name is required";
-    
-    if (!formData.workEmail.trim()) {
-      newErrors.workEmail = "Work email is required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.workEmail)) {
-      newErrors.workEmail = "Please enter a valid email address";
-    }
-    
-    if (!formData.role.trim()) newErrors.role = "Role/Title is required";
-    if (!formData.companySize) newErrors.companySize = "Company size is required";
-    if (!formData.timeZoneRegion) newErrors.timeZoneRegion = "Time zone region is required";
-    if (!formData.timeZoneOverlap) newErrors.timeZoneOverlap = "Time zone overlap preference is required";
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Format website URL before validation
-    const formattedUrl = formatWebsiteUrl(formData.companyWebsite);
-    updateFormData({ companyWebsite: formattedUrl });
+    const { errors, isValid } = validateStep1(formData);
+    setErrors(errors);
     
-    if (validate()) {
+    if (isValid) {
       onNext();
     }
   };
@@ -109,15 +51,11 @@ const Step1CompanyInfo = ({ formData, updateFormData, onNext }: Step1Props) => {
           />
         </FormField>
 
-        <FormField label="Company Website" required error={errors.companyWebsite}>
-          <Input
-            value={formData.companyWebsite}
-            onChange={handleWebsiteChange}
-            onBlur={handleWebsiteBlur}
-            placeholder="yourdomain.com"
-            className="w-full"
-          />
-        </FormField>
+        <WebsiteField 
+          value={formData.companyWebsite}
+          onChange={(value) => updateFormData({ companyWebsite: value })}
+          error={errors.companyWebsite}
+        />
 
         <FormField label="Contact Name" required error={errors.contactName}>
           <Input

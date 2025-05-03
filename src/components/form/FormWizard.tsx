@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FormData } from "@/types/form";
@@ -68,19 +67,8 @@ const FormWizard = () => {
     try {
       await submitForm(formData);
       nextStep(); // Move to confirmation screen on success
-      toast({
-        title: "Request Submitted Successfully!",
-        description: "Check your email for a magic link to access your dashboard.",
-        duration: 6000,
-      });
     } catch (error: any) {
       console.error("Submission error:", error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to submit your request",
-        variant: "destructive",
-        duration: 5000,
-      });
     }
   };
 

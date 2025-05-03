@@ -22,17 +22,17 @@ const ConfirmationScreen = ({ onViewDashboard }: ConfirmationScreenProps) => {
           Thank you for your developer request. We'll review your needs and start matching you with the perfect developers.
         </p>
         <div className="bg-blue-50 p-4 rounded-md text-blue-800 text-sm mb-4">
-          <p className="font-medium mb-2">Next Step:</p>
-          <p>We've sent a magic link to your email. Click it to securely access your dashboard where you can track your request status.</p>
+          <p className="font-medium mb-2">Important:</p>
+          <p>We've sent a <strong>magic link</strong> to your email. You <strong>must click this link</strong> to securely access your dashboard where you can track your request status.</p>
         </div>
         <p className="text-sm text-gray-500">
-          Don't see the email? Check your spam folder or try accessing the dashboard below.
+          Don't see the email? Check your spam folder or try submitting again.
         </p>
       </div>
       
       {onViewDashboard && (
         <Button onClick={onViewDashboard} className="mt-4">
-          Access Dashboard
+          Try Accessing Dashboard
         </Button>
       )}
     </div>

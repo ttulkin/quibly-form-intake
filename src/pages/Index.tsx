@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import FormContainer from "@/components/form/FormContainer";
@@ -77,32 +76,36 @@ const Index = () => {
 
       if (authError) throw authError;
 
+      // Convert Date object to ISO string for Supabase
+      const requestData = {
+        company_name: formData.companyName,
+        company_website: formData.companyWebsite,
+        contact_name: formData.contactName,
+        work_email: formData.workEmail,
+        role: formData.role,
+        company_size: formData.companySize,
+        time_zone_region: formData.timeZoneRegion,
+        time_zone_overlap: formData.timeZoneOverlap,
+        is_asap: formData.isASAP,
+        // Convert Date object to ISO string if it exists
+        start_date: formData.startDate ? formData.startDate.toISOString() : null,
+        estimated_duration: formData.estimatedDuration,
+        weekly_hours: formData.weeklyHours,
+        monthly_budget: formData.monthlyBudget,
+        notes: formData.notes,
+      };
+
       // Then insert the request
-      const { data: requestData, error: requestError } = await supabase
+      const { data: insertedRequestData, error: requestError } = await supabase
         .from("company_requests")
-        .insert({
-          company_name: formData.companyName,
-          company_website: formData.companyWebsite,
-          contact_name: formData.contactName,
-          work_email: formData.workEmail,
-          role: formData.role,
-          company_size: formData.companySize,
-          time_zone_region: formData.timeZoneRegion,
-          time_zone_overlap: formData.timeZoneOverlap,
-          is_asap: formData.isASAP,
-          start_date: formData.startDate,
-          estimated_duration: formData.estimatedDuration,
-          weekly_hours: formData.weeklyHours,
-          monthly_budget: formData.monthlyBudget,
-          notes: formData.notes,
-        })
+        .insert(requestData)
         .select();
 
       if (requestError) throw requestError;
 
       // Insert developer roles
-      if (requestData && requestData.length > 0) {
-        const requestId = requestData[0].id;
+      if (insertedRequestData && insertedRequestData.length > 0) {
+        const requestId = insertedRequestData[0].id;
 
         // Map developer roles to the format for insertion
         const developerRolesToInsert = formData.developerRoles.map(role => ({

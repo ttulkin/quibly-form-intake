@@ -13,7 +13,7 @@ interface MatchedDeveloper {
   status: string;
   start_date: string | null;
   role_id: string;
-  developer_skills: string[];
+  developer_skills: string[] | any; // Updated to handle both string[] and Json types
   role: {
     role_title: string;
   } | null;
@@ -43,7 +43,14 @@ const ContractorsList = () => {
 
         if (error) throw error;
         
-        setContractors(data || []);
+        // Transform the data to ensure developer_skills is always an array
+        const transformedData = data?.map(dev => ({
+          ...dev,
+          developer_skills: Array.isArray(dev.developer_skills) ? dev.developer_skills : 
+            (typeof dev.developer_skills === 'string' ? [dev.developer_skills] : [])
+        }));
+        
+        setContractors(transformedData || []);
       } catch (error: any) {
         toast({
           title: "Error fetching contractors",
@@ -115,7 +122,7 @@ const ContractorsList = () => {
                 <div>
                   <div className="text-sm font-medium mb-1">Skills:</div>
                   <div className="flex flex-wrap gap-1">
-                    {contractor.developer_skills.map((skill, i) => (
+                    {contractor.developer_skills.map((skill: string, i: number) => (
                       <Badge key={i} variant="outline" className="bg-gray-50">
                         {skill}
                       </Badge>

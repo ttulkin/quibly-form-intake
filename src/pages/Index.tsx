@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import FormContainer from "@/components/form/FormContainer";
 import Step1CompanyInfo from "@/components/form/Step1CompanyInfo";
 import Step2DeveloperRoles from "@/components/form/Step2DeveloperRoles";
@@ -106,7 +106,13 @@ const Index = () => {
         .insert(requestData)
         .select();
 
-      if (requestError) throw requestError;
+      if (requestError) {
+        // Check if the error is related to RLS or authentication
+        if (requestError.message && requestError.message.includes('violates row-level security policy')) {
+          throw new Error("Authentication required. We've sent you a magic link - please check your email and try submitting again after login.");
+        }
+        throw requestError;
+      }
 
       // Insert developer roles
       if (insertedRequestData && insertedRequestData.length > 0) {
@@ -193,6 +199,16 @@ const Index = () => {
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Quibly</h1>
           <p className="text-gray-600">Your shortcut to startup-ready engineers</p>
+          {currentStep < 1 && (
+            <div className="mt-4">
+              <p className="text-sm text-gray-500">
+                Already submitted a request?{" "}
+                <Link to="/login" className="text-blue-600 hover:text-blue-800 underline">
+                  Log in
+                </Link>
+              </p>
+            </div>
+          )}
         </div>
         
         {currentStep < 3 && (

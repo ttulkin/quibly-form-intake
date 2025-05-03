@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button";
 import { FormData, DeveloperRole } from "@/types/form";
 import DeveloperRoleCard from "./DeveloperRoleCard";
 import { ChevronLeft, Plus } from "lucide-react";
+import FormField from "./FormField";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface Step2Props {
   formData: FormData;
@@ -45,6 +48,14 @@ const Step2DeveloperRoles = ({ formData, updateFormData, onNext, onPrev }: Step2
     });
   };
 
+  const toggleJobDescription = (checked: boolean) => {
+    updateFormData({ 
+      hasJobDescription: checked,
+      // Reset job description when unchecked
+      jobDescription: checked ? formData.jobDescription : ""
+    });
+  };
+
   const validate = () => {
     const newErrors: Record<string, string> = {};
     
@@ -54,6 +65,10 @@ const Step2DeveloperRoles = ({ formData, updateFormData, onNext, onPrev }: Step2
       if (!role.seniorityLevel) newErrors[`seniorityLevel-${role.id}`] = "Seniority level is required";
       if (!role.numberOfDevelopers || role.numberOfDevelopers < 1) newErrors[`numberOfDevelopers-${role.id}`] = "Number of developers must be at least 1";
     });
+    
+    if (formData.hasJobDescription && !formData.jobDescription.trim()) {
+      newErrors.jobDescription = "Please provide a job description or uncheck the option";
+    }
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -69,8 +84,38 @@ const Step2DeveloperRoles = ({ formData, updateFormData, onNext, onPrev }: Step2
   return (
     <form onSubmit={handleSubmit}>
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Developer Role(s)</h2>
-        <p className="text-gray-600">Describe the developer roles you're looking to fill</p>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Who Are You Hiring?</h2>
+        <p className="text-gray-600">Tell us what kind of dev(s) your startup needs</p>
+      </div>
+
+      <div className="mb-8 bg-white p-6 rounded-lg border shadow-sm">
+        <div className="flex items-center space-x-2 mb-4">
+          <Checkbox 
+            id="hasJobDescription" 
+            checked={formData.hasJobDescription}
+            onCheckedChange={toggleJobDescription}
+          />
+          <label 
+            htmlFor="hasJobDescription" 
+            className="text-sm font-medium leading-none cursor-pointer"
+          >
+            I have a job description ready
+          </label>
+        </div>
+        
+        {formData.hasJobDescription && (
+          <FormField 
+            label="Paste your job description or link" 
+            error={errors.jobDescription}
+          >
+            <Textarea
+              value={formData.jobDescription}
+              onChange={(e) => updateFormData({ jobDescription: e.target.value })}
+              placeholder="Paste your job description text or link here"
+              className="w-full h-32 resize-none"
+            />
+          </FormField>
+        )}
       </div>
 
       {formData.developerRoles.map((role, index) => (
@@ -92,7 +137,7 @@ const Step2DeveloperRoles = ({ formData, updateFormData, onNext, onPrev }: Step2
           onClick={handleAddRole}
         >
           <Plus size={16} />
-          Add Another Role
+          Add Another Dev Role
         </Button>
       </div>
 
@@ -107,7 +152,7 @@ const Step2DeveloperRoles = ({ formData, updateFormData, onNext, onPrev }: Step2
           Previous
         </Button>
         <Button type="submit" className="px-8">
-          Next: Budget & Timeline
+          Next: Budget & Timing Stuff
         </Button>
       </div>
     </form>

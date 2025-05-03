@@ -22,7 +22,6 @@ import { format } from "date-fns";
 import { CalendarIcon, ChevronLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
-import MultiSelect from "./MultiSelect";
 
 interface Step3Props {
   formData: FormData;
@@ -30,13 +29,6 @@ interface Step3Props {
   onNext: () => void;
   onPrev: () => void;
 }
-
-const communicationToolOptions = [
-  "Slack", "Microsoft Teams", "Zoom", "Google Meet", "Discord",
-  "Jira", "Trello", "Asana", "ClickUp", "Monday.com",
-  "Notion", "Confluence", "GitHub", "GitLab", "BitBucket",
-  "Figma", "Miro", "Linear", "Shortcut", "Basecamp"
-];
 
 const Step3BudgetTimeline = ({ formData, updateFormData, onNext, onPrev }: Step3Props) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -48,7 +40,6 @@ const Step3BudgetTimeline = ({ formData, updateFormData, onNext, onPrev }: Step3
     if (!formData.estimatedDuration) newErrors.estimatedDuration = "Estimated duration is required";
     if (!formData.weeklyHours) newErrors.weeklyHours = "Weekly hours is required";
     if (!formData.monthlyBudget) newErrors.monthlyBudget = "Monthly budget is required";
-    if (formData.communicationTools.length === 0) newErrors.communicationTools = "At least one communication tool is required";
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -71,12 +62,12 @@ const Step3BudgetTimeline = ({ formData, updateFormData, onNext, onPrev }: Step3
   return (
     <form onSubmit={handleSubmit}>
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Budget & Timeline</h2>
-        <p className="text-gray-600">Let us know your project timeline and budget expectations</p>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Timeline & Budget</h2>
+        <p className="text-gray-600">Tell us how soon, how long, and how much you're working with</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <FormField label="Start Date" required error={errors.startDate} className="flex flex-col">
+        <FormField label="When do you want to start?" required error={errors.startDate} className="flex flex-col">
           <div className="flex items-center gap-4">
             <div className="flex items-center space-x-2">
               <Checkbox 
@@ -121,7 +112,7 @@ const Step3BudgetTimeline = ({ formData, updateFormData, onNext, onPrev }: Step3
           </div>
         </FormField>
 
-        <FormField label="Estimated Duration" required error={errors.estimatedDuration}>
+        <FormField label="How long do you need them?" required error={errors.estimatedDuration}>
           <Select 
             value={formData.estimatedDuration}
             onValueChange={(value) => updateFormData({ estimatedDuration: value })}
@@ -138,7 +129,7 @@ const Step3BudgetTimeline = ({ formData, updateFormData, onNext, onPrev }: Step3
           </Select>
         </FormField>
 
-        <FormField label="Weekly Hours per Developer" required error={errors.weeklyHours}>
+        <FormField label="Hours per week per dev" required error={errors.weeklyHours}>
           <Select 
             value={formData.weeklyHours}
             onValueChange={(value) => updateFormData({ weeklyHours: value })}
@@ -154,7 +145,7 @@ const Step3BudgetTimeline = ({ formData, updateFormData, onNext, onPrev }: Step3
           </Select>
         </FormField>
 
-        <FormField label="Monthly Budget per Developer" required error={errors.monthlyBudget}>
+        <FormField label="Max budget per dev/month" required error={errors.monthlyBudget}>
           <Select 
             value={formData.monthlyBudget}
             onValueChange={(value) => updateFormData({ monthlyBudget: value })}
@@ -171,17 +162,7 @@ const Step3BudgetTimeline = ({ formData, updateFormData, onNext, onPrev }: Step3
           </Select>
         </FormField>
 
-        <FormField label="Communication Tools" required className="md:col-span-2" error={errors.communicationTools}>
-          <MultiSelect 
-            options={communicationToolOptions}
-            selected={formData.communicationTools}
-            onChange={(selected) => updateFormData({ communicationTools: selected })}
-            placeholder="Select communication tools"
-            allowCustom={true}
-          />
-        </FormField>
-
-        <FormField label="Additional Notes" className="md:col-span-2">
+        <FormField label="Anything else we should know?" className="md:col-span-2">
           <Textarea
             value={formData.notes}
             onChange={(e) => updateFormData({ notes: e.target.value })}
@@ -202,7 +183,7 @@ const Step3BudgetTimeline = ({ formData, updateFormData, onNext, onPrev }: Step3
           Previous
         </Button>
         <Button type="submit" className="px-8">
-          Submit Request
+          🚀 Submit & Match Me
         </Button>
       </div>
     </form>

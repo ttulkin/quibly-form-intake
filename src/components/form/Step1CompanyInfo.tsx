@@ -95,8 +95,8 @@ const Step1CompanyInfo = ({ formData, updateFormData, onNext }: Step1Props) => {
   return (
     <form onSubmit={handleSubmit}>
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Company & Contact Information</h2>
-        <p className="text-gray-600">Tell us about your company and how we can reach you</p>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Let's Get to Know You</h2>
+        <p className="text-gray-600">Quick intro so we can send the right talent your way</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -164,7 +164,7 @@ const Step1CompanyInfo = ({ formData, updateFormData, onNext }: Step1Props) => {
           </Select>
         </FormField>
 
-        <FormField label="Time Zone Region" required error={errors.timeZoneRegion}>
+        <FormField label="Where's your team based?" required error={errors.timeZoneRegion}>
           <Select 
             value={formData.timeZoneRegion}
             onValueChange={(value) => updateFormData({ timeZoneRegion: value })}
@@ -185,7 +185,7 @@ const Step1CompanyInfo = ({ formData, updateFormData, onNext }: Step1Props) => {
           </Select>
         </FormField>
 
-        <FormField label="Time Zone Overlap Preference" required error={errors.timeZoneOverlap}>
+        <FormField label="How much overlap do you need with your devs?" required error={errors.timeZoneOverlap}>
           <Select 
             value={formData.timeZoneOverlap}
             onValueChange={(value) => updateFormData({ timeZoneOverlap: value })}
@@ -204,7 +204,7 @@ const Step1CompanyInfo = ({ formData, updateFormData, onNext }: Step1Props) => {
 
       <div className="mt-8 flex justify-end">
         <Button type="submit" className="px-8">
-          Next: Developer Roles
+          Next: Pick Your Dev Dream Team
         </Button>
       </div>
     </form>

@@ -57,7 +57,7 @@ const DeveloperRoleCard = ({
       )}
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <FormField label="Role Title" required error={errors[`roleTitle-${role.id}`]}>
+        <FormField label="What's the role?" required error={errors[`roleTitle-${role.id}`]}>
           <Select 
             value={role.roleTitle}
             onValueChange={(value) => onUpdate(role.id, { roleTitle: value })}
@@ -79,7 +79,7 @@ const DeveloperRoleCard = ({
           </Select>
         </FormField>
 
-        <FormField label="Seniority Level" required error={errors[`seniorityLevel-${role.id}`]}>
+        <FormField label="Level of experience?" required error={errors[`seniorityLevel-${role.id}`]}>
           <Select 
             value={role.seniorityLevel}
             onValueChange={(value) => onUpdate(role.id, { seniorityLevel: value })}
@@ -96,7 +96,7 @@ const DeveloperRoleCard = ({
           </Select>
         </FormField>
 
-        <FormField label="Required Tech Stack" required className="md:col-span-2" error={errors[`requiredTechStack-${role.id}`]}>
+        <FormField label="Must-have tech skills" required className="md:col-span-2" error={errors[`requiredTechStack-${role.id}`]}>
           <MultiSelect 
             options={techOptions}
             selected={role.requiredTechStack}
@@ -106,7 +106,7 @@ const DeveloperRoleCard = ({
           />
         </FormField>
 
-        <FormField label="Nice-to-Have Skills" className="md:col-span-2">
+        <FormField label="Bonus skills (optional)" className="md:col-span-2">
           <Textarea
             value={role.niceToHaveSkills}
             onChange={(e) => onUpdate(role.id, { niceToHaveSkills: e.target.value })}
@@ -115,7 +115,7 @@ const DeveloperRoleCard = ({
           />
         </FormField>
 
-        <FormField label="Preferred Spoken Languages (Other Than English)" className="md:col-span-2">
+        <FormField label="Other languages (if helpful)" className="md:col-span-2">
           <MultiSelect 
             options={languageOptions}
             selected={role.preferredLanguages}
@@ -124,7 +124,7 @@ const DeveloperRoleCard = ({
           />
         </FormField>
 
-        <FormField label="Number of Developers" required error={errors[`numberOfDevelopers-${role.id}`]}>
+        <FormField label="How many are you hiring?" required error={errors[`numberOfDevelopers-${role.id}`]}>
           <Input
             type="number"
             min="1"

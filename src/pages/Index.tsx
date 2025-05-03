@@ -18,7 +18,7 @@ const Index = () => {
     workEmail: "",
     role: "",
     companySize: "",
-    timeZoneRegion: "", // New field for time zone region
+    timeZoneRegion: "",
     timeZoneOverlap: "",
     
     // Step 2: Developer Role(s) Needed
@@ -33,6 +33,8 @@ const Index = () => {
         numberOfDevelopers: 1
       }
     ],
+    hasJobDescription: false,
+    jobDescription: "",
     
     // Step 3: Budget & Timeline
     startDate: undefined,
@@ -40,7 +42,6 @@ const Index = () => {
     estimatedDuration: "",
     weeklyHours: "",
     monthlyBudget: "",
-    communicationTools: [],
     notes: ""
   });
 
@@ -101,8 +102,8 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Talent Path</h1>
-          <p className="text-gray-600">Find the perfect developers for your project</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Quibly</h1>
+          <p className="text-gray-600">Your shortcut to startup-ready engineers</p>
         </div>
         
         {currentStep < 3 && (

@@ -26,11 +26,13 @@ export interface FormData {
   workEmail: string;
   role: string;
   companySize: CompanySize | string;
-  timeZoneRegion: TimeZoneRegion | string; // New field for time zone region
+  timeZoneRegion: TimeZoneRegion | string;
   timeZoneOverlap: TimeZoneOverlap | string;
   
   // Step 2: Developer Role(s) Needed
   developerRoles: DeveloperRole[];
+  hasJobDescription: boolean;
+  jobDescription: string;
   
   // Step 3: Budget & Timeline
   startDate?: Date;
@@ -38,6 +40,5 @@ export interface FormData {
   estimatedDuration: EstimatedDuration | string;
   weeklyHours: WeeklyHours | string;
   monthlyBudget: MonthlyBudget | string;
-  communicationTools: string[];
   notes: string;
 }

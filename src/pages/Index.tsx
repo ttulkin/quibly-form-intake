@@ -9,6 +9,7 @@ import StepIndicator from "@/components/form/StepIndicator";
 import { FormData } from "@/types/form";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { validateFormSubmission, prepareFormDataForSubmission } from "@/utils/formValidation";
 
 const Index = () => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -65,6 +66,20 @@ const Index = () => {
 
   const handleSubmit = async () => {
     setSubmitting(true);
+    
+    // First validate the form data
+    const { isValid, errors } = validateFormSubmission(formData);
+    if (!isValid) {
+      toast({
+        title: "Validation Error",
+        description: "Please check the form for errors and try again.",
+        variant: "destructive",
+        duration: 5000,
+      });
+      setSubmitting(false);
+      return;
+    }
+    
     try {
       // First send magic link to user
       const { error: authError } = await supabase.auth.signInWithOtp({
@@ -79,29 +94,11 @@ const Index = () => {
       // Get the current user's session 
       const { data: sessionData } = await supabase.auth.getSession();
       
-      // Prepare the request data WITHOUT user_id initially
-      const requestData = {
-        company_name: formData.companyName,
-        company_website: formData.companyWebsite,
-        contact_name: formData.contactName,
-        work_email: formData.workEmail,
-        role: formData.role,
-        company_size: formData.companySize,
-        time_zone_region: formData.timeZoneRegion,
-        time_zone_overlap: formData.timeZoneOverlap,
-        is_asap: formData.isASAP,
-        // Convert Date object to ISO string if it exists
-        start_date: formData.startDate ? formData.startDate.toISOString() : null,
-        estimated_duration: formData.estimatedDuration,
-        weekly_hours: formData.weeklyHours,
-        monthly_budget: formData.monthlyBudget,
-        notes: formData.notes,
-      };
-
-      // Only add user_id if we have a valid session with user
-      if (sessionData?.session?.user?.id) {
-        Object.assign(requestData, { user_id: sessionData.session.user.id });
-      }
+      // Prepare the request data
+      const requestData = prepareFormDataForSubmission(
+        formData, 
+        sessionData?.session?.user?.id
+      );
 
       // Now try to insert the request
       const { data: insertedRequestData, error: requestError } = await supabase
@@ -142,13 +139,13 @@ const Index = () => {
 
       nextStep();
     } catch (error: any) {
+      console.error("Submission error:", error);
       toast({
         title: "Error",
         description: error.message || "Failed to submit your request",
         variant: "destructive",
         duration: 5000,
       });
-      console.error("Submission error:", error);
     } finally {
       setSubmitting(false);
     }

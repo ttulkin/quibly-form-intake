@@ -1,7 +1,8 @@
+
 import { useState, useRef, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Check, ChevronsUpDown, X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -86,45 +87,47 @@ const MultiSelect = ({
             value={inputValue}
             onValueChange={setInputValue}
           />
-          <CommandEmpty>
-            {allowCustom ? (
-              <div className="px-2 py-3">
-                <div className="text-sm text-muted-foreground mb-1">No item found.</div>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  className="w-full"
-                  onClick={() => {
-                    if (inputValue && !selected.includes(inputValue)) {
-                      onChange([...selected, inputValue]);
-                      setInputValue("");
-                    }
-                  }}
-                >
-                  Add "{inputValue}"
-                </Button>
-              </div>
-            ) : (
-              <div className="py-6 text-center text-sm">No results found.</div>
-            )}
-          </CommandEmpty>
-          <CommandGroup className="max-h-60 overflow-auto">
-            {options
-              .filter(option => !inputValue || option.toLowerCase().includes(inputValue.toLowerCase()))
-              .map((option) => (
-                <CommandItem
-                  key={option}
-                  value={option}
-                  onSelect={() => handleSelect(option)}
-                  className="flex items-center justify-between"
-                >
-                  <span>{option}</span>
-                  {selected.includes(option) && (
-                    <Check size={16} className="text-primary" />
-                  )}
-                </CommandItem>
-              ))}
-          </CommandGroup>
+          <CommandList>
+            <CommandEmpty>
+              {allowCustom ? (
+                <div className="px-2 py-3">
+                  <div className="text-sm text-muted-foreground mb-1">No item found.</div>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="w-full"
+                    onClick={() => {
+                      if (inputValue && !selected.includes(inputValue)) {
+                        onChange([...selected, inputValue]);
+                        setInputValue("");
+                      }
+                    }}
+                  >
+                    Add "{inputValue}"
+                  </Button>
+                </div>
+              ) : (
+                <div className="py-6 text-center text-sm">No results found.</div>
+              )}
+            </CommandEmpty>
+            <CommandGroup className="max-h-60 overflow-auto">
+              {options
+                .filter(option => !inputValue || option.toLowerCase().includes(inputValue.toLowerCase()))
+                .map((option) => (
+                  <CommandItem
+                    key={option}
+                    value={option}
+                    onSelect={() => handleSelect(option)}
+                    className="flex items-center justify-between"
+                  >
+                    <span>{option}</span>
+                    {selected.includes(option) && (
+                      <Check size={16} className="text-primary" />
+                    )}
+                  </CommandItem>
+                ))}
+            </CommandGroup>
+          </CommandList>
         </Command>
       </PopoverContent>
     </Popover>

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FormData } from "@/types/form";
@@ -74,8 +75,8 @@ const FormWizard = () => {
     console.log("Navigating to dashboard via explicit dashboard path");
     // Set form submission flag for RootRedirect to pick up
     localStorage.setItem('just_submitted_form', 'true');
-    // Navigate directly to the dashboard to avoid any redirection issues
-    navigate("/dashboard", { replace: true });
+    // Navigate directly to root to trigger the proper redirection logic
+    navigate("/", { replace: true });
   };
 
   const renderStep = () => {

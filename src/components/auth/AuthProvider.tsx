@@ -77,20 +77,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             const profileData = await fetchProfile(currentSession.user.id);
             setProfile(profileData);
             setLoading(false);
-            
-            // Check if this is a verification from form submission
-            const url = new URL(window.location.href);
-            if (url.pathname === '/verify') {
-              console.log("Auth verification detected at /verify route", {
-                params: Object.fromEntries(url.searchParams.entries())
-              });
-              
-              // If this is a form-originated flow, we'll track it for dashboard usage
-              if (url.searchParams.get('from_form') === 'true') {
-                localStorage.setItem('just_submitted_form', 'true');
-                console.log("Form submission flow detected, set flag in localStorage");
-              }
-            }
           }, 0);
         } else {
           console.log("No user session");

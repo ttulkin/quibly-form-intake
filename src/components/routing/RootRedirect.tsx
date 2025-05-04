@@ -8,7 +8,7 @@
  */
 
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -17,6 +17,7 @@ const RootRedirect = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [redirectAttempted, setRedirectAttempted] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     // Wait until auth loading finishes
@@ -30,7 +31,8 @@ const RootRedirect = () => {
       isAuthenticated: !!user,
       hasProfile: !!profile,
       userType: profile?.user_type,
-      path: window.location.pathname
+      path: window.location.pathname,
+      currentLocation: location.pathname
     });
     
     if (!user) {
@@ -82,7 +84,7 @@ const RootRedirect = () => {
         // Fallback to generic dashboard
         navigate("/dashboard", { replace: true });
     }
-  }, [loading, user, profile, navigate, toast]);
+  }, [loading, user, profile, navigate, toast, location]);
 
   // Show loading spinner while checking authentication
   return (

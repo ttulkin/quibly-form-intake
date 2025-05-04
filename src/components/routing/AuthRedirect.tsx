@@ -52,7 +52,10 @@ const AuthRedirect = () => {
       });
       
       // Always redirect to root which will then route to appropriate dashboard
-      navigate("/", { replace: true });
+      // Using a setTimeout to ensure we don't redirect before state is updated
+      setTimeout(() => {
+        navigate("/", { replace: true });
+      }, 100);
     } else {
       console.log("No user found after verification, redirecting to login");
       toast({

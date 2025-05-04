@@ -40,16 +40,12 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
         console.log("User arrived from magic link verification");
         toast({
           title: "Welcome!",
-          description: "You've successfully signed in",
+          description: "You've successfully signed in. You can now view your requests.",
+          duration: 5000,
         });
       }
-
-      // Ensure we're on the right path based on user type
-      if (profile) {
-        console.log(`User has profile with type: ${profile.user_type}`);
-      }
     }
-  }, [loading, user, toast, location.pathname, profile, navigate]);
+  }, [loading, user, toast, location.pathname, profile]);
 
   if (loading) {
     console.log("Auth state still loading...");

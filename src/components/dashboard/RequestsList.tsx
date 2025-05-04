@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 import { formatDistanceToNow } from "date-fns";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 interface CompanyRequest {
   id: string;
@@ -31,47 +32,79 @@ const RequestsList = () => {
   const [requests, setRequests] = useState<CompanyRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { user } = useAuth();
 
+  // Function to fetch requests data
+  const fetchRequests = async () => {
+    if (!user) {
+      console.log("No user found, skipping request fetch");
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      console.log("Fetching requests for user:", user.id);
+      
+      // Get company requests
+      const { data: requestsData, error: requestsError } = await supabase
+        .from("company_requests")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (requestsError) throw requestsError;
+      
+      console.log("Fetched requests:", requestsData?.length || 0);
+
+      // For each request, get the associated developer roles
+      const requestsWithRoles = await Promise.all(
+        requestsData.map(async (request) => {
+          const { data: rolesData } = await supabase
+            .from("developer_roles")
+            .select("*")
+            .eq("request_id", request.id);
+
+          return {
+            ...request,
+            developer_roles: rolesData || [],
+          };
+        })
+      );
+
+      setRequests(requestsWithRoles);
+    } catch (error: any) {
+      console.error("Error fetching requests:", error);
+      toast({
+        title: "Error fetching requests",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch requests on component mount and when user changes
   useEffect(() => {
-    const fetchRequests = async () => {
-      try {
-        // Get company requests
-        const { data: requestsData, error: requestsError } = await supabase
-          .from("company_requests")
-          .select("*")
-          .order("created_at", { ascending: false });
+    if (user) {
+      fetchRequests();
+    }
+  }, [user]);
 
-        if (requestsError) throw requestsError;
-
-        // For each request, get the associated developer roles
-        const requestsWithRoles = await Promise.all(
-          requestsData.map(async (request) => {
-            const { data: rolesData } = await supabase
-              .from("developer_roles")
-              .select("*")
-              .eq("request_id", request.id);
-
-            return {
-              ...request,
-              developer_roles: rolesData || [],
-            };
-          })
-        );
-
-        setRequests(requestsWithRoles);
-      } catch (error: any) {
-        toast({
-          title: "Error fetching requests",
-          description: error.message,
-          variant: "destructive",
-        });
-      } finally {
-        setLoading(false);
+  // Handle page visibility changes to refresh data when tab becomes visible
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && user) {
+        console.log("Tab became visible, refreshing requests");
+        fetchRequests();
       }
     };
 
-    fetchRequests();
-  }, [toast]);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [user]);
 
   if (loading) {
     return (

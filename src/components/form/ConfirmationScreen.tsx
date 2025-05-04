@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Mail } from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface ConfirmationScreenProps {
@@ -23,9 +23,17 @@ const ConfirmationScreen = ({ onViewDashboard }: ConfirmationScreenProps) => {
           Thank you for your developer request. We'll review your needs and start matching you with the perfect developers.
         </p>
         <div className="bg-blue-50 p-4 rounded-md text-blue-800 text-sm mb-4">
-          <p className="font-medium mb-2">Important:</p>
-          <p>We've sent a <strong>magic link</strong> to your email. You <strong>must click this link</strong> to securely access your dashboard where you can track your request status.</p>
-          <p className="mt-2"><strong>Note:</strong> When clicking the magic link, you'll be redirected to the dashboard. If you're not seeing the dashboard, please refresh the page after clicking the link.</p>
+          <div className="flex items-center gap-2 font-medium mb-2">
+            <Mail className="h-4 w-4" />
+            <p>Important Email Instructions:</p>
+          </div>
+          <ol className="list-decimal pl-5 text-left space-y-2">
+            <li>Check your email inbox for a <strong>magic link</strong> from Quibly</li>
+            <li><strong>Click the magic link</strong> to verify your email and access your dashboard</li>
+            <li>After clicking, you'll be taken directly to your dashboard where you can view your request</li>
+            <li>If you're not automatically redirected, try refreshing your browser</li>
+          </ol>
+          <p className="mt-3 font-medium">Need help? Contact support@quibly.com</p>
         </div>
         <p className="text-sm text-gray-500">
           Don't see the email? Check your spam folder or try submitting again.

@@ -32,7 +32,7 @@ export const useFormSubmission = () => {
       const { error: authError } = await supabase.auth.signInWithOtp({
         email: formData.workEmail,
         options: {
-          emailRedirectTo: window.location.origin, // Consistent format with LoginForm
+          emailRedirectTo: window.location.origin + "/verify", // Ensure consistent redirect to verify route
         },
       });
 
@@ -73,6 +73,7 @@ export const useFormSubmission = () => {
         // If the request was successfully inserted, try to insert the developer roles
         if (insertedRequestData && insertedRequestData.length > 0) {
           const requestId = insertedRequestData[0].id;
+          console.log("Created request with ID:", requestId);
 
           // Map developer roles to the format for insertion
           const developerRolesToInsert = formData.developerRoles.map(role => ({

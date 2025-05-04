@@ -25,6 +25,7 @@ const queryClient = new QueryClient({
 // Redirect component to handle authentication-based redirects
 const AuthRedirect = () => {
   const { user, loading } = useAuth();
+  console.log("AuthRedirect: Handling magic link verification", { user, loading });
   
   // While checking auth status, show nothing to avoid flashes
   if (loading) return null;
@@ -44,6 +45,7 @@ const App = () => (
             {/* Public routes - accessible without authentication */}
             <Route path="/login" element={<Login />} />
             <Route path="/form" element={<Index />} />
+            <Route path="/company-intake" element={<CompanyIntake />} />
             
             {/* Protected routes - require authentication */}
             <Route 
@@ -51,14 +53,6 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Dashboard />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/company-intake" 
-              element={
-                <ProtectedRoute>
-                  <CompanyIntake />
                 </ProtectedRoute>
               } 
             />

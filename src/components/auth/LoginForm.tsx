@@ -32,12 +32,13 @@ const LoginForm = () => {
     setLoading(true);
     console.log(`Sending magic link to: ${email}`);
     console.log(`Current origin: ${window.location.origin}`);
+    console.log(`Redirect path: ${from}`);
 
     try {
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: window.location.origin,
+          emailRedirectTo: window.location.origin + "/verify", // Set explicit path
         },
       });
 
@@ -48,8 +49,8 @@ const LoginForm = () => {
       console.log("Magic link sent successfully");
       toast({
         title: "Magic link sent!",
-        description: "Check your email for the login link.",
-        duration: 5000,
+        description: "Check your email for the login link. Click the link to access your dashboard.",
+        duration: 8000,
       });
     } catch (error: any) {
       console.error("Login error:", error.message);

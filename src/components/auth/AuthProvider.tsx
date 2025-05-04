@@ -58,7 +58,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, currentSession) => {
-        console.log(`Auth state changed, event: ${event}, has session: ${!!currentSession}`);
+        console.log(`Auth state changed, event: ${event}, has session: ${!!currentSession}, url: ${window.location.href}`);
         
         // Always update session and user state synchronously
         setSession(currentSession);
@@ -72,6 +72,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             const profileData = await fetchProfile(currentSession.user.id);
             setProfile(profileData);
             setLoading(false);
+            
+            // Check if this is a verification from form submission
+            const url = new URL(window.location.href);
+            if (url.pathname === '/verify' || url.searchParams.has('type')) {
+              console.log("Auth verification detected, toast will show on dashboard");
+            }
           }, 0);
         } else {
           console.log("No user session");

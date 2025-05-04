@@ -17,6 +17,7 @@ type AuthContextType = {
   user: User | null;
   profile: UserProfile | null;
   loading: boolean;
+  profileLoading: boolean; // New state to track profile loading separately
   signOut: () => Promise<void>;
 };
 
@@ -27,6 +28,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [profileLoading, setProfileLoading] = useState(false); // Added new state
   const { toast } = useToast();
 
   // Enhanced fetchProfile function with better error handling
@@ -72,15 +74,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (currentSession?.user) {
           console.log(`User authenticated: ${currentSession.user.email}`);
           
+          // Set profileLoading to true before fetching profile
+          setProfileLoading(true);
+          
           // Use a timeout to avoid potential deadlocks with Supabase client
           setTimeout(async () => {
             const profileData = await fetchProfile(currentSession.user.id);
             setProfile(profileData);
+            // Mark profile loading as complete
+            setProfileLoading(false);
             setLoading(false);
           }, 0);
         } else {
           console.log("No user session");
           setProfile(null);
+          setProfileLoading(false);
           setLoading(false);
         }
       }
@@ -96,8 +104,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(initialSession?.user ?? null);
       
       if (initialSession?.user) {
+        // Set profile loading to true before fetching profile
+        setProfileLoading(true);
         const profileData = await fetchProfile(initialSession.user.id);
         setProfile(profileData);
+        setProfileLoading(false);
       }
       
       setLoading(false);
@@ -120,7 +131,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ session, user, profile, loading, signOut }}>
+    <AuthContext.Provider value={{ session, user, profile, loading, profileLoading, signOut }}>
       {children}
     </AuthContext.Provider>
   );

@@ -13,15 +13,18 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import { useToast } from "@/components/ui/use-toast";
 
 const RootRedirect = () => {
-  const { profile, user, loading } = useAuth();
+  const { profile, profileLoading, user, loading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [redirectAttempted, setRedirectAttempted] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
-    // Wait until auth loading finishes
-    if (loading) return;
+    // Wait until both auth loading and profile loading finish
+    if (loading || profileLoading) {
+      console.log("RootRedirect: Still loading", { authLoading: loading, profileLoading });
+      return;
+    }
     
     // Prevent multiple redirects
     if (redirectAttempted) return;
@@ -30,6 +33,7 @@ const RootRedirect = () => {
     console.log("RootRedirect: Handling navigation", { 
       isAuthenticated: !!user,
       hasProfile: !!profile,
+      profileLoading,
       userType: profile?.user_type,
       path: window.location.pathname,
       currentLocation: location.pathname
@@ -54,8 +58,9 @@ const RootRedirect = () => {
     }
     
     // User is authenticated but check if profile exists
+    // We now know it's genuinely null because profileLoading is false
     if (!profile) {
-      console.log("User authenticated but no profile, showing generic dashboard");
+      console.log("User authenticated but no profile found after loading completed, showing generic dashboard");
       navigate("/dashboard", { replace: true });
       return;
     }
@@ -84,7 +89,7 @@ const RootRedirect = () => {
         // Fallback to generic dashboard
         navigate("/dashboard", { replace: true });
     }
-  }, [loading, user, profile, navigate, toast, location]);
+  }, [loading, profileLoading, user, profile, navigate, toast, location, redirectAttempted]);
 
   // Show loading spinner while checking authentication
   return (
@@ -92,6 +97,9 @@ const RootRedirect = () => {
       <div className="text-center">
         <div className="h-16 w-16 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto mb-4"></div>
         <p className="text-sm text-gray-500">Loading your dashboard...</p>
+        {profileLoading && user && (
+          <p className="text-xs text-gray-400 mt-2">Retrieving your profile information...</p>
+        )}
       </div>
     </div>
   );

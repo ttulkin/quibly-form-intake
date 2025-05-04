@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "./AuthProvider";
 import { useToast } from "@/components/ui/use-toast";
@@ -12,55 +12,17 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const { user, loading } = useAuth();
   const location = useLocation();
   const { toast } = useToast();
-  const [justSubmittedForm, setJustSubmittedForm] = useState<boolean>(false);
-  const [checkPerformed, setCheckPerformed] = useState<boolean>(false);
 
   useEffect(() => {
-    // Only run this check once to prevent infinite loops
-    if (checkPerformed) return;
-    
-    // Check if this is a user who just submitted a form
-    const formSubmitted = localStorage.getItem('just_submitted_form') === 'true';
-    setJustSubmittedForm(formSubmitted);
-    
-    if (!loading) {
-      setCheckPerformed(true);
-      
-      if (!user) {
-        console.log("User not authenticated, redirecting to login");
-        toast({
-          title: "Authentication Required",
-          description: "Please sign in to access this page",
-          variant: "destructive",
-        });
-      } else {
-        console.log(`User authenticated: ${user.email} at path: ${location.pathname}`);
-        
-        // Check if this is a redirect from email verification
-        const params = new URLSearchParams(window.location.search);
-        const isVerification = params.has('type') && (
-          params.get('type') === 'signup' || 
-          params.get('type') === 'magiclink'
-        );
-        
-        if (isVerification || formSubmitted) {
-          console.log("User arrived from magic link verification or form submission");
-          
-          // Clear the form submission flag if it was set
-          if (formSubmitted) {
-            localStorage.removeItem('just_submitted_form');
-            setJustSubmittedForm(false);
-          }
-          
-          toast({
-            title: "Welcome to your dashboard!",
-            description: "You've successfully signed in. You can now view your requests.",
-            duration: 5000,
-          });
-        }
-      }
+    if (!loading && !user) {
+      console.log("User not authenticated, redirecting to login");
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to access this page",
+        variant: "destructive",
+      });
     }
-  }, [loading, user, toast, location.pathname, checkPerformed]);
+  }, [loading, user, toast]);
 
   if (loading) {
     return (

@@ -7,7 +7,7 @@
  * - Unauthenticated users are redirected to the login page
  */
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useToast } from "@/components/ui/use-toast";
@@ -16,14 +16,39 @@ const RootRedirect = () => {
   const { profile, user, loading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [redirectAttempted, setRedirectAttempted] = useState(false);
 
   useEffect(() => {
+    // Wait until auth loading finishes
     if (loading) return;
+    
+    // Prevent multiple redirects
+    if (redirectAttempted) return;
+    setRedirectAttempted(true);
+    
+    console.log("RootRedirect: Handling navigation", { 
+      isAuthenticated: !!user,
+      hasProfile: !!profile,
+      userType: profile?.user_type,
+      path: window.location.pathname
+    });
     
     if (!user) {
       console.log("User not authenticated, redirecting to login");
       navigate("/login", { replace: true });
       return;
+    }
+    
+    // Check if this is a redirect after form submission
+    const justSubmittedForm = localStorage.getItem('just_submitted_form') === 'true';
+    if (justSubmittedForm) {
+      console.log("User just submitted form, clearing flag and showing welcome toast");
+      localStorage.removeItem('just_submitted_form');
+      toast({
+        title: "Welcome to your dashboard!",
+        description: "You've successfully accessed your dashboard. You can now view your requests.",
+        duration: 5000,
+      });
     }
     
     // User is authenticated but check if profile exists
@@ -64,7 +89,7 @@ const RootRedirect = () => {
     <div className="flex min-h-screen items-center justify-center">
       <div className="text-center">
         <div className="h-16 w-16 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto mb-4"></div>
-        <p className="text-sm text-gray-500">Loading...</p>
+        <p className="text-sm text-gray-500">Loading your dashboard...</p>
       </div>
     </div>
   );

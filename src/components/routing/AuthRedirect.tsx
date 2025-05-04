@@ -38,11 +38,19 @@ const AuthRedirect = () => {
     
     if (user) {
       console.log("Verified user, redirecting to dashboard", { email: user.email });
+      
+      // If this was from a form submission, set the flag in localStorage
+      if (fromForm) {
+        localStorage.setItem('just_submitted_form', 'true');
+        console.log("Form flag set in localStorage");
+      }
+      
       toast({
         title: "Successfully logged in",
         description: "Welcome back! You've been successfully authenticated.",
         duration: 5000,
       });
+      
       // Always redirect to root which will then route to appropriate dashboard
       navigate("/", { replace: true });
     } else {

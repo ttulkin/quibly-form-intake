@@ -13,10 +13,18 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log("Dashboard: Checking profile state", { 
+      hasProfile: !!profile, 
+      profileLoading, 
+      loading,
+      profileType: profile?.user_type 
+    });
+
     // Only redirect when we're sure profile loading is complete
     if (!loading && !profileLoading && profile) {
       // If profile exists with a specific type, redirect to the appropriate dashboard
       const userType = profile.user_type;
+      console.log("Dashboard: Redirecting to type-specific dashboard", { userType });
       
       if (userType === "company") {
         navigate("/dashboard/company", { replace: true });
@@ -34,7 +42,7 @@ const Dashboard = () => {
       <div className="text-center py-12">
         <h1 className="text-2xl font-bold mb-4">Welcome to Quibly</h1>
         
-        {profileLoading ? (
+        {profileLoading || loading ? (
           <div>
             <p className="text-gray-600 mb-6">
               We're retrieving your profile information...

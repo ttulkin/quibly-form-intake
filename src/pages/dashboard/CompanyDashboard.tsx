@@ -7,17 +7,51 @@ import RequestsList from "@/components/dashboard/RequestsList";
 import ContractorsList from "@/components/dashboard/ContractorsList";
 import { useState } from "react";
 
+/**
+ * Dashboard specifically for company users
+ */
 const CompanyDashboard = () => {
   const [activeTab, setActiveTab] = useState<"requests" | "contractors">("requests");
-  const { profile, user } = useAuth();
+  const { profile, profileLoading, user } = useAuth();
   const navigate = useNavigate();
   
   useEffect(() => {
-    // Ensure user has the correct role
-    if (profile && profile.user_type !== "company") {
-      navigate("/");
+    console.log("CompanyDashboard: Checking profile", { 
+      hasProfile: !!profile, 
+      profileLoading, 
+      userType: profile?.user_type,
+      userId: user?.id
+    });
+    
+    // Wait for profile loading to complete
+    if (profileLoading) {
+      return;
     }
-  }, [profile, navigate]);
+    
+    // Handle missing profile (redirect to generic dashboard)
+    if (!profile) {
+      console.log("CompanyDashboard: No profile found, redirecting to dashboard");
+      navigate("/dashboard", { replace: true });
+      return;
+    }
+    
+    // Ensure user has the correct role
+    if (profile.user_type !== "company") {
+      console.log("CompanyDashboard: User is not a company, redirecting to root");
+      navigate("/", { replace: true });
+    }
+  }, [profile, profileLoading, navigate, user]);
+
+  // Don't render content until profile is loaded and confirmed to be company type
+  if (profileLoading || !profile || profile.user_type !== "company") {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center min-h-[50vh]">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>

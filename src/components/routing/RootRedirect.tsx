@@ -63,10 +63,10 @@ const RootRedirect = () => {
       });
     }
     
-    // User is authenticated but check if profile exists
-    // We now know it's genuinely null because profileLoading is false
+    // We now know profileLoading is false at this point
+    // If profile doesn't exist, redirect to generic dashboard which will handle onboarding flow
     if (!profile) {
-      console.log("User authenticated but no profile found after loading completed, showing generic dashboard");
+      console.log("User authenticated but no profile found, redirecting to generic dashboard");
       navigate("/dashboard", { replace: true });
       return;
     }

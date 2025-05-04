@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [profileLoading, setProfileLoading] = useState(false); // Added profileLoading state
   const { toast } = useToast();
 
-  // Consolidated profile fetching function
+  // Consolidated profile fetching function with additional logging
   const safeLoadProfile = async (userId: string) => {
     console.log(`Loading profile for user: ${userId}, setting profileLoading=true`);
     setProfileLoading(true);
@@ -78,10 +78,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           console.log(`User authenticated: ${currentSession.user.email}`);
           
           // Use a timeout to avoid potential deadlocks with Supabase client
+          // Increase timeout to ensure it doesn't interfere with initial loading
           setTimeout(async () => {
             await safeLoadProfile(currentSession.user.id);
             setLoading(false);
-          }, 0);
+          }, 100); // Slight delay to avoid race conditions
         } else {
           console.log("No user session");
           setProfile(null);

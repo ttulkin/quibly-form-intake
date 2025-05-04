@@ -57,11 +57,10 @@ const AuthRedirect = () => {
         duration: 5000,
       });
       
-      // Always redirect to root which will then route to appropriate dashboard
-      // Using a setTimeout to ensure we don't redirect before state is updated
+      // Increased delay to ensure profile has time to load
       setTimeout(() => {
         navigate("/", { replace: true });
-      }, 500); // Increased delay to ensure profile has time to load
+      }, 1500);
     } else {
       console.log("No user found after verification, redirecting to login");
       toast({

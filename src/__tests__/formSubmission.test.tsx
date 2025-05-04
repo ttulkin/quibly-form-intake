@@ -1,9 +1,8 @@
-
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
-import Index from '@/pages/Index';
+import CompanyIntake from '@/pages/CompanyIntake';
 import { supabase } from "@/integrations/supabase/client";
 import { ToastProvider } from "@/components/ui/toast";
 
@@ -73,7 +72,7 @@ describe('Form Submission', () => {
     render(
       <BrowserRouter>
         <ToastProvider>
-          <Index />
+          <CompanyIntake />
         </ToastProvider>
       </BrowserRouter>
     );
@@ -97,7 +96,7 @@ describe('Form Submission', () => {
     render(
       <BrowserRouter>
         <ToastProvider>
-          <Index />
+          <CompanyIntake />
         </ToastProvider>
       </BrowserRouter>
     );
@@ -122,7 +121,7 @@ describe('Form Submission', () => {
     render(
       <BrowserRouter>
         <ToastProvider>
-          <Index />
+          <CompanyIntake />
         </ToastProvider>
       </BrowserRouter>
     );
@@ -146,7 +145,7 @@ describe('Form Submission', () => {
     render(
       <BrowserRouter>
         <ToastProvider>
-          <Index />
+          <CompanyIntake />
         </ToastProvider>
       </BrowserRouter>
     );

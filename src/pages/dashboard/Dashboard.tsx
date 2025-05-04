@@ -16,12 +16,13 @@ const Dashboard = () => {
     if (!loading && profile) {
       // If profile exists with a specific type, redirect to the appropriate dashboard
       const userType = profile.user_type;
+      
       if (userType === "company") {
-        navigate("/dashboard/company");
+        navigate("/dashboard/company", { replace: true });
       } else if (userType === "candidate") {
-        navigate("/dashboard/candidate");
+        navigate("/dashboard/candidate", { replace: true });
       } else if (userType === "admin") {
-        navigate("/dashboard/admin");
+        navigate("/dashboard/admin", { replace: true });
       }
     }
   }, [profile, loading, navigate]);

@@ -16,13 +16,11 @@ const AuthRedirect = () => {
   
   // Extract context information from URL if present
   const fromForm = searchParams.get("from_form") === "true";
-  const verifyType = searchParams.get("type");
   
   console.log("AuthRedirect: Handling magic link verification", { 
     user, 
     loading, 
-    fromForm, 
-    verifyType,
+    fromForm,
     searchParams: Object.fromEntries(searchParams.entries())
   });
   

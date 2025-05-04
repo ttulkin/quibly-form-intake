@@ -4,6 +4,9 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 
+/**
+ * Dashboard specifically for candidate users
+ */
 const CandidateDashboard = () => {
   const { profile } = useAuth();
   const navigate = useNavigate();

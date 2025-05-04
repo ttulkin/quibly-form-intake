@@ -18,44 +18,44 @@ const RootRedirect = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (!loading) {
-      if (!user) {
-        console.log("User not authenticated, redirecting to login");
-        navigate("/login");
-        return;
-      }
-      
-      // User is authenticated but check if profile exists
-      if (!profile) {
-        console.log("User authenticated but no profile, showing generic dashboard");
-        navigate("/dashboard");
-        return;
-      }
-      
-      // Redirect based on user type
-      const userType = profile.user_type;
-      console.log(`Redirecting authenticated user to ${userType} dashboard`);
-      
-      switch (userType) {
-        case "company":
-          navigate("/dashboard/company");
-          break;
-        case "candidate":
-          navigate("/dashboard/candidate");
-          break;
-        case "admin":
-          navigate("/dashboard/admin");
-          break;
-        default:
-          console.error("Unknown user type:", userType);
-          toast({
-            title: "Navigation Error",
-            description: "We couldn't determine your dashboard type. Please contact support.",
-            variant: "destructive",
-          });
-          // Fallback to generic dashboard
-          navigate("/dashboard");
-      }
+    if (loading) return;
+    
+    if (!user) {
+      console.log("User not authenticated, redirecting to login");
+      navigate("/login", { replace: true });
+      return;
+    }
+    
+    // User is authenticated but check if profile exists
+    if (!profile) {
+      console.log("User authenticated but no profile, showing generic dashboard");
+      navigate("/dashboard", { replace: true });
+      return;
+    }
+    
+    // Redirect based on user type
+    const userType = profile.user_type;
+    console.log(`Redirecting authenticated user to ${userType} dashboard`);
+    
+    switch (userType) {
+      case "company":
+        navigate("/dashboard/company", { replace: true });
+        break;
+      case "candidate":
+        navigate("/dashboard/candidate", { replace: true });
+        break;
+      case "admin":
+        navigate("/dashboard/admin", { replace: true });
+        break;
+      default:
+        console.error("Unknown user type:", userType);
+        toast({
+          title: "Navigation Error",
+          description: "We couldn't determine your dashboard type. Please contact support.",
+          variant: "destructive",
+        });
+        // Fallback to generic dashboard
+        navigate("/dashboard", { replace: true });
     }
   }, [loading, user, profile, navigate, toast]);
 

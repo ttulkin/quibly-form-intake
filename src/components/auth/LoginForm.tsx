@@ -30,10 +30,7 @@ const LoginForm = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    console.log(`Sending magic link to: ${email}`);
-    console.log(`Current origin: ${window.location.origin}`);
-    console.log(`Redirect path: ${from}`);
-
+    
     try {
       const { error } = await supabase.auth.signInWithOtp({
         email,

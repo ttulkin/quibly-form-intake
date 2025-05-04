@@ -28,11 +28,11 @@ export const useFormSubmission = () => {
       console.log(`Sending magic link to: ${formData.workEmail}`);
       console.log(`Current origin for redirect: ${window.location.origin}`);
       
-      // Send magic link to user
+      // Send magic link to user with form context parameter
       const { error: authError } = await supabase.auth.signInWithOtp({
         email: formData.workEmail,
         options: {
-          emailRedirectTo: window.location.origin + "/verify", // Ensure consistent redirect to verify route
+          emailRedirectTo: `${window.location.origin}/verify?from_form=true`, // Add form context
         },
       });
 
@@ -42,11 +42,16 @@ export const useFormSubmission = () => {
       const { data: sessionData } = await supabase.auth.getSession();
       
       try {
-        // Prepare the request data
+        // Prepare the request data with user ID from session if available
         const requestData = prepareFormDataForSubmission(
           formData, 
           sessionData?.session?.user?.id
         );
+
+        console.log("Submitting company request with data:", {
+          ...requestData,
+          user_id: sessionData?.session?.user?.id || null
+        });
 
         // Now try to insert the request
         const { data: insertedRequestData, error: requestError } = await supabase

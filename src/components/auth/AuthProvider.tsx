@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  // Fetch user profile data based on user ID
+  // Enhanced fetchProfile function with better error handling
   const fetchProfile = async (userId: string) => {
     try {
       console.log(`Fetching profile for user ID: ${userId}`);
@@ -41,6 +41,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       if (error) {
         console.error('Error fetching user profile:', error);
+        return null;
+      }
+      
+      if (!data) {
+        console.log("No profile found for user ID:", userId);
         return null;
       }
       
@@ -75,8 +80,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             
             // Check if this is a verification from form submission
             const url = new URL(window.location.href);
-            if (url.pathname === '/verify' || url.searchParams.has('type')) {
-              console.log("Auth verification detected, toast will show on dashboard");
+            if (url.pathname === '/verify') {
+              console.log("Auth verification detected at /verify route", {
+                params: Object.fromEntries(url.searchParams.entries())
+              });
+              
+              // If this is a form-originated flow, we'll track it for dashboard usage
+              if (url.searchParams.get('from_form') === 'true') {
+                localStorage.setItem('just_submitted_form', 'true');
+                console.log("Form submission flow detected, set flag in localStorage");
+              }
             }
           }, 0);
         } else {
@@ -116,6 +129,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     console.log("Signing out user");
     setLoading(true);
     await supabase.auth.signOut();
+    localStorage.removeItem('just_submitted_form');
     setLoading(false);
   };
 

@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 import { formatDistanceToNow } from "date-fns";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 interface CompanyRequest {
   id: string;
@@ -31,13 +33,16 @@ const statusColors: Record<string, string> = {
 const RequestsList = () => {
   const [requests, setRequests] = useState<CompanyRequest[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
+  const navigate = useNavigate();
 
-  // Function to fetch requests data
+  // Function to fetch requests data with improved error handling and logging
   const fetchRequests = async () => {
     if (!user) {
       console.log("No user found, skipping request fetch");
+      setLoading(false);
       return;
     }
     
@@ -45,34 +50,62 @@ const RequestsList = () => {
     try {
       console.log("Fetching requests for user:", user.id);
       
-      // Get company requests
-      const { data: requestsData, error: requestsError } = await supabase
+      // Try to get company requests linked to the current user
+      // First try by user_id
+      let { data: requestsData, error: requestsError } = await supabase
         .from("company_requests")
         .select("*")
+        .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
-      if (requestsError) throw requestsError;
+      console.log("User ID-based request query results:", { count: requestsData?.length || 0, error: requestsError });
+        
+      // If no results, try by work_email as fallback
+      if ((!requestsData || requestsData.length === 0) && user.email) {
+        console.log("No requests found by user_id, trying by email:", user.email);
+        const { data: emailRequests, error: emailError } = await supabase
+          .from("company_requests")
+          .select("*")
+          .eq("work_email", user.email)
+          .order("created_at", { ascending: false });
+          
+        if (emailRequests && emailRequests.length > 0) {
+          console.log("Found requests by email match:", emailRequests.length);
+          requestsData = emailRequests;
+          requestsError = emailError;
+        }
+      }
+
+      if (requestsError) {
+        console.error("Error fetching requests:", requestsError);
+        setFetchError(requestsError.message);
+        return;
+      }
       
       console.log("Fetched requests:", requestsData?.length || 0);
 
       // For each request, get the associated developer roles
-      const requestsWithRoles = await Promise.all(
-        requestsData.map(async (request) => {
-          const { data: rolesData } = await supabase
-            .from("developer_roles")
-            .select("*")
-            .eq("request_id", request.id);
+      if (requestsData) {
+        const requestsWithRoles = await Promise.all(
+          requestsData.map(async (request) => {
+            const { data: rolesData } = await supabase
+              .from("developer_roles")
+              .select("*")
+              .eq("request_id", request.id);
 
-          return {
-            ...request,
-            developer_roles: rolesData || [],
-          };
-        })
-      );
+            return {
+              ...request,
+              developer_roles: rolesData || [],
+            };
+          })
+        );
 
-      setRequests(requestsWithRoles);
+        setRequests(requestsWithRoles);
+        setFetchError(null);
+      }
     } catch (error: any) {
       console.error("Error fetching requests:", error);
+      setFetchError(error.message);
       toast({
         title: "Error fetching requests",
         description: error.message,
@@ -114,6 +147,16 @@ const RequestsList = () => {
     );
   }
 
+  if (fetchError) {
+    return (
+      <div className="text-center p-12">
+        <h3 className="text-lg font-medium text-red-600">Error loading requests</h3>
+        <p className="mt-1 text-sm text-gray-500">{fetchError}</p>
+        <Button onClick={fetchRequests} className="mt-4">Try Again</Button>
+      </div>
+    );
+  }
+
   if (requests.length === 0) {
     return (
       <div className="text-center p-12">
@@ -121,6 +164,12 @@ const RequestsList = () => {
         <p className="mt-1 text-sm text-gray-500">
           Submit your first developer request to get started
         </p>
+        <Button 
+          onClick={() => navigate('/company-intake')} 
+          className="mt-4"
+        >
+          Submit a Request
+        </Button>
       </div>
     );
   }

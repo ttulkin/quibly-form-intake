@@ -10,11 +10,28 @@ import { useToast } from "@/components/ui/use-toast";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState<"requests" | "contractors">("requests");
-  const { profile, loading } = useAuth();
+  const { profile, user, loading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // If profile is loaded but user is not an admin or company, redirect to login
+  useEffect(() => {
+    console.log("Dashboard mounted, auth state:", { 
+      loading, 
+      profile, 
+      userEmail: user?.email 
+    });
+    
+    // Check if we just came from a form submission flow
+    const justSubmittedForm = localStorage.getItem('just_submitted_form') === 'true';
+    
+    if (justSubmittedForm) {
+      console.log("User just submitted a form before logging in");
+      // Clear the flag
+      localStorage.removeItem('just_submitted_form');
+    }
+  }, [profile, loading, user]);
+
+  // If profile is loaded but user is not an admin or company, show appropriate message
   useEffect(() => {
     if (!loading && profile) {
       if (profile.user_type === 'candidate') {
@@ -30,7 +47,10 @@ const Dashboard = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+        <div className="text-center">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+          <p className="text-sm text-gray-500 mt-4">Loading your dashboard...</p>
+        </div>
       </div>
     );
   }

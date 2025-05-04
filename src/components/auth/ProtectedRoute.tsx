@@ -15,17 +15,31 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const { toast } = useToast();
 
   useEffect(() => {
+    console.log("ProtectedRoute checking auth state:", { 
+      loading, 
+      isAuthenticated: !!user, 
+      path: location.pathname 
+    });
+
     // If authentication check is complete and user is not logged in
     if (!loading && !user) {
+      console.log("User not authenticated, redirecting to login");
       toast({
         title: "Authentication Required",
         description: "Please sign in to access this page",
         variant: "destructive",
       });
+    } else if (!loading && user) {
+      console.log("User authenticated:", user.email);
+      // Ensure we're on the right path based on user type
+      if (location.pathname === "/" && profile) {
+        console.log("User authenticated at root with profile type:", profile.user_type);
+      }
     }
-  }, [loading, user, toast]);
+  }, [loading, user, toast, location.pathname, profile]);
 
   if (loading) {
+    console.log("Auth state still loading...");
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
@@ -38,10 +52,12 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   }
 
   if (!user) {
+    console.log("Redirecting to login from protected route");
     // Store the intended destination to redirect after login
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
 
+  console.log("Authentication successful, rendering protected content");
   return <>{children}</>;
 };
 

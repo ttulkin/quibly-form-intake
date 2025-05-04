@@ -29,7 +29,7 @@ export const useFormSubmission = () => {
       const { error: authError } = await supabase.auth.signInWithOtp({
         email: formData.workEmail,
         options: {
-          emailRedirectTo: `${window.location.origin}/`, // Ensure root path redirect
+          emailRedirectTo: window.location.origin, // Removed trailing slash for consistency
         },
       });
 

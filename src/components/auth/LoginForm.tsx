@@ -14,12 +14,13 @@ const LoginForm = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    console.log("Sending magic link to:", email);
 
     try {
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: window.location.origin, // Updated to redirect to root
+          emailRedirectTo: window.location.origin, // Exact URL without trailing slash
         },
       });
 
@@ -27,12 +28,14 @@ const LoginForm = () => {
         throw error;
       }
 
+      console.log("Magic link sent successfully");
       toast({
         title: "Magic link sent!",
         description: "Check your email for the login link.",
         duration: 5000,
       });
     } catch (error: any) {
+      console.error("Login error:", error.message);
       toast({
         title: "Error",
         description: error.message || "Failed to send magic link",

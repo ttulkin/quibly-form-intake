@@ -30,16 +30,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { toast } = useToast();
 
   useEffect(() => {
+    console.log("AuthProvider initializing...");
+    
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
+        console.log("Auth state changed, event:", _event);
+        
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
+          console.log("User authenticated:", session.user.email);
           try {
             // Fetch user profile after a slight delay to prevent deadlocks
             setTimeout(async () => {
+              console.log("Fetching user profile...");
               const { data, error } = await supabase
                 .from('profiles')
                 .select('*')
@@ -49,6 +55,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               if (error) {
                 console.error('Error fetching user profile:', error);
               } else {
+                console.log("Profile data received:", data);
                 setProfile(data);
               }
               setLoading(false);
@@ -58,6 +65,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             setLoading(false);
           }
         } else {
+          console.log("No user session");
           setProfile(null);
           setLoading(false);
         }
@@ -65,13 +73,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     );
 
     // THEN check for existing session
+    console.log("Checking for existing session...");
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log("Initial session check:", session ? "Session found" : "No session");
       setSession(session);
       setUser(session?.user ?? null);
       
       if (session?.user) {
         try {
           // Fetch user profile
+          console.log("Fetching user profile for initial session...");
           supabase
             .from('profiles')
             .select('*')
@@ -81,6 +92,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               if (error) {
                 console.error('Error fetching user profile:', error);
               } else {
+                console.log("Initial profile data:", data);
                 setProfile(data);
               }
               setLoading(false);
@@ -94,10 +106,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      console.log("AuthProvider cleanup - unsubscribing from auth state changes");
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signOut = async () => {
+    console.log("Signing out user");
     await supabase.auth.signOut();
   };
 

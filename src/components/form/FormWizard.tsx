@@ -64,8 +64,12 @@ const FormWizard = () => {
 
   const handleSubmit = async () => {
     try {
-      await submitForm(formData);
-      nextStep(); // Move to confirmation screen on success
+      const success = await submitForm(formData);
+      if (success) {
+        // Only advance to confirmation step on success
+        // Don't call nextStep() here since we'll navigate away after showing confirmation
+        setCurrentStep(3); // Set directly to confirmation step
+      }
     } catch (error: any) {
       console.error("Submission error:", error);
     }
@@ -105,7 +109,7 @@ const FormWizard = () => {
             updateFormData={updateFormData}
             onNext={handleSubmit}
             onPrev={prevStep}
-            submitting={submitting}
+            submitting={submitting} // Pass submitting state to disable button
           />
         );
       case 3:

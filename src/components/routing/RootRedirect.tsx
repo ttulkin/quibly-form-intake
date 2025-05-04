@@ -22,7 +22,13 @@ const RootRedirect = () => {
   useEffect(() => {
     // Wait until both auth loading and profile loading finish
     if (loading || profileLoading) {
-      console.log("RootRedirect: Still loading", { authLoading: loading, profileLoading });
+      console.log("RootRedirect: Still loading", { 
+        authLoading: loading, 
+        profileLoading,
+        hasUser: !!user,
+        hasProfile: !!profile,
+        currentPath: location.pathname
+      });
       return;
     }
     

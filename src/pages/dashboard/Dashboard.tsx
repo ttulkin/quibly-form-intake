@@ -44,7 +44,7 @@ const Dashboard = () => {
         ) : !profile ? (
           <div>
             <p className="text-gray-600 mb-6">
-              Your account is missing profile information. Please contact support or complete the onboarding process.
+              Your account is missing profile information. Please complete the onboarding process.
             </p>
             <button 
               onClick={() => navigate("/company-intake")} 

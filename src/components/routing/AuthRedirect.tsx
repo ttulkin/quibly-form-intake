@@ -11,7 +11,7 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import { useToast } from "@/components/ui/use-toast";
 
 const AuthRedirect = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, profile, profileLoading } = useAuth();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -22,7 +22,9 @@ const AuthRedirect = () => {
   
   console.log("AuthRedirect: Handling magic link verification", { 
     user, 
-    loading, 
+    loading,
+    profile,
+    profileLoading,
     fromForm,
     verificationAttempted,
     searchParams: Object.fromEntries(searchParams.entries())
@@ -30,14 +32,18 @@ const AuthRedirect = () => {
   
   // Effect to handle navigation once auth state is determined
   useEffect(() => {
-    if (loading) return; // Wait until auth check completes
+    // Wait until both auth and profile loading have completed
+    if (loading || (user && profileLoading)) {
+      console.log("AuthRedirect: Still loading", { authLoading: loading, profileLoading });
+      return;
+    }
     
     // Make sure we only handle verification once to prevent loops
     if (verificationAttempted) return;
     setVerificationAttempted(true);
     
     if (user) {
-      console.log("Verified user, redirecting to dashboard", { email: user.email });
+      console.log("Verified user, redirecting to dashboard", { email: user.email, hasProfile: !!profile });
       
       // If this was from a form submission, set the flag in localStorage
       if (fromForm) {
@@ -55,7 +61,7 @@ const AuthRedirect = () => {
       // Using a setTimeout to ensure we don't redirect before state is updated
       setTimeout(() => {
         navigate("/", { replace: true });
-      }, 100);
+      }, 500); // Increased delay to ensure profile has time to load
     } else {
       console.log("No user found after verification, redirecting to login");
       toast({
@@ -66,7 +72,7 @@ const AuthRedirect = () => {
       });
       navigate("/login", { replace: true });
     }
-  }, [user, loading, navigate, verificationAttempted, toast, fromForm]);
+  }, [user, loading, profile, profileLoading, navigate, verificationAttempted, toast, fromForm]);
   
   // While checking auth status, show loading indicator
   return (

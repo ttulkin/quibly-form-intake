@@ -17,7 +17,7 @@ type AuthContextType = {
   user: User | null;
   profile: UserProfile | null;
   loading: boolean;
-  profileLoading: boolean; // New state to track profile loading separately
+  profileLoading: boolean; // Added profileLoading state
   signOut: () => Promise<void>;
 };
 
@@ -28,13 +28,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [profileLoading, setProfileLoading] = useState(false); // Added new state
+  const [profileLoading, setProfileLoading] = useState(false); // Added profileLoading state
   const { toast } = useToast();
 
-  // Enhanced fetchProfile function with better error handling
-  const fetchProfile = async (userId: string) => {
+  // Consolidated profile fetching function
+  const safeLoadProfile = async (userId: string) => {
+    console.log(`Loading profile for user: ${userId}, setting profileLoading=true`);
+    setProfileLoading(true);
+    
     try {
-      console.log(`Fetching profile for user ID: ${userId}`);
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -43,19 +45,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       if (error) {
         console.error('Error fetching user profile:', error);
-        return null;
-      }
-      
-      if (!data) {
+        setProfile(null);
+      } else if (!data) {
         console.log("No profile found for user ID:", userId);
-        return null;
+        setProfile(null);
+      } else {
+        console.log("Profile data loaded:", data);
+        setProfile(data);
       }
-      
-      console.log("Profile data received:", data);
-      return data;
     } catch (error) {
-      console.error('Failed to fetch profile:', error);
-      return null;
+      console.error('Exception during profile fetch:', error);
+      setProfile(null);
+    } finally {
+      console.log(`Profile load complete, setting profileLoading=false`);
+      setProfileLoading(false);
     }
   };
 
@@ -74,15 +77,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (currentSession?.user) {
           console.log(`User authenticated: ${currentSession.user.email}`);
           
-          // Set profileLoading to true before fetching profile
-          setProfileLoading(true);
-          
           // Use a timeout to avoid potential deadlocks with Supabase client
           setTimeout(async () => {
-            const profileData = await fetchProfile(currentSession.user.id);
-            setProfile(profileData);
-            // Mark profile loading as complete
-            setProfileLoading(false);
+            await safeLoadProfile(currentSession.user.id);
             setLoading(false);
           }, 0);
         } else {
@@ -104,11 +101,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(initialSession?.user ?? null);
       
       if (initialSession?.user) {
-        // Set profile loading to true before fetching profile
-        setProfileLoading(true);
-        const profileData = await fetchProfile(initialSession.user.id);
-        setProfile(profileData);
-        setProfileLoading(false);
+        await safeLoadProfile(initialSession.user.id);
       }
       
       setLoading(false);

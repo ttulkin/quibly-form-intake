@@ -20,7 +20,7 @@ const LoginForm = () => {
   useEffect(() => {
     if (user) {
       console.log("User already authenticated, redirecting to dashboard");
-      navigate("/");
+      navigate("/", { replace: true });
     }
   }, [user, navigate]);
   
@@ -29,13 +29,28 @@ const LoginForm = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!email || email.trim() === "") {
+      toast({
+        title: "Email Required",
+        description: "Please enter your email address to continue.",
+        variant: "destructive",
+        duration: 3000,
+      });
+      return;
+    }
+    
     setLoading(true);
     
     try {
+      // Generate a well-formed redirect URL with explicit origin
+      const redirectTo = new URL("/verify", window.location.origin).toString();
+      console.log("Magic link will redirect to:", redirectTo);
+      
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: window.location.origin + "/verify", // Set explicit path
+          emailRedirectTo: redirectTo,
         },
       });
 

@@ -13,13 +13,19 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const location = useLocation();
   const { toast } = useToast();
   const [justSubmittedForm, setJustSubmittedForm] = useState<boolean>(false);
+  const [checkPerformed, setCheckPerformed] = useState<boolean>(false);
 
   useEffect(() => {
+    // Only run this check once to prevent infinite loops
+    if (checkPerformed) return;
+    
     // Check if this is a user who just submitted a form
     const formSubmitted = localStorage.getItem('just_submitted_form') === 'true';
     setJustSubmittedForm(formSubmitted);
     
     if (!loading) {
+      setCheckPerformed(true);
+      
       if (!user) {
         console.log("User not authenticated, redirecting to login");
         toast({
@@ -54,7 +60,7 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
         }
       }
     }
-  }, [loading, user, toast, location.pathname]);
+  }, [loading, user, toast, location.pathname, checkPerformed]);
 
   if (loading) {
     return (

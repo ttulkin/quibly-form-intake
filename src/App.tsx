@@ -42,7 +42,6 @@ const App = () => (
             
             {/* Public routes - accessible without authentication */}
             <Route path="/login" element={<Login />} />
-            {/* Removed the redundant /form route */}
             <Route path="/company-intake" element={<CompanyIntake />} />
             <Route path="/candidate-intake" element={<CandidateIntake />} />
             

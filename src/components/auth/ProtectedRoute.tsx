@@ -18,7 +18,9 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     console.log("ProtectedRoute checking auth state:", { 
       loading, 
       isAuthenticated: !!user, 
-      path: location.pathname 
+      path: location.pathname,
+      referrer: document.referrer,
+      userEmail: user?.email
     });
 
     // If authentication check is complete and user is not logged in
@@ -30,13 +32,24 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
         variant: "destructive",
       });
     } else if (!loading && user) {
-      console.log("User authenticated:", user.email);
+      console.log(`User authenticated: ${user.email} at path: ${location.pathname}`);
+      
+      // Check if this is a redirect from email verification
+      const params = new URLSearchParams(window.location.search);
+      if (params.has('type') && params.get('type') === 'signup') {
+        console.log("User arrived from magic link verification");
+        toast({
+          title: "Welcome!",
+          description: "You've successfully signed in",
+        });
+      }
+
       // Ensure we're on the right path based on user type
-      if (location.pathname === "/" && profile) {
-        console.log("User authenticated at root with profile type:", profile.user_type);
+      if (profile) {
+        console.log(`User has profile with type: ${profile.user_type}`);
       }
     }
-  }, [loading, user, toast, location.pathname, profile]);
+  }, [loading, user, toast, location.pathname, profile, navigate]);
 
   if (loading) {
     console.log("Auth state still loading...");
@@ -52,7 +65,7 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   }
 
   if (!user) {
-    console.log("Redirecting to login from protected route");
+    console.log(`Redirecting to login from protected route: ${location.pathname}`);
     // Store the intended destination to redirect after login
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }

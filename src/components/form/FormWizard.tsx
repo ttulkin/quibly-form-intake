@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FormData } from "@/types/form";
@@ -20,7 +21,6 @@ const defaultFormData: FormData = {
   timeZoneRegion: "",
   timeZoneOverlap: "",
   
-  // Step 2: Developer Role(s) Needed
   developerRoles: [
     {
       id: Date.now().toString(),
@@ -35,7 +35,6 @@ const defaultFormData: FormData = {
   hasJobDescription: false,
   jobDescription: "",
   
-  // Step 3: Budget & Timeline
   startDate: undefined,
   isASAP: false,
   estimatedDuration: "",
@@ -71,6 +70,11 @@ const FormWizard = () => {
       console.error("Submission error:", error);
     }
   };
+  
+  const handleNavigateToDashboard = () => {
+    console.log("Attempting to navigate to dashboard");
+    navigate("/"); // Use root path consistently
+  };
 
   const renderStep = () => {
     switch (currentStep) {
@@ -102,7 +106,7 @@ const FormWizard = () => {
           />
         );
       case 3:
-        return <ConfirmationScreen onViewDashboard={() => navigate("/dashboard")} />;
+        return <ConfirmationScreen onViewDashboard={handleNavigateToDashboard} />;
       default:
         return null;
     }

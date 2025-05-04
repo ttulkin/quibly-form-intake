@@ -11,8 +11,27 @@ import Login from "./pages/Login";
 import CompanyIntake from "./pages/CompanyIntake";
 import NotFound from "./pages/NotFound";
 import Index from "./pages/Index";
+import { useAuth } from "./components/auth/AuthProvider";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
+// Redirect component to handle authentication-based redirects
+const AuthRedirect = () => {
+  const { user, loading } = useAuth();
+  
+  // While checking auth status, show nothing to avoid flashes
+  if (loading) return null;
+  
+  // If authenticated, go to dashboard, otherwise to login
+  return user ? <Navigate to="/" replace /> : <Navigate to="/login" replace />;
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -22,9 +41,11 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
+            {/* Public routes - accessible without authentication */}
             <Route path="/login" element={<Login />} />
-            <Route path="/company-intake" element={<CompanyIntake />} />
             <Route path="/form" element={<Index />} />
+            
+            {/* Protected routes - require authentication */}
             <Route 
               path="/" 
               element={
@@ -33,6 +54,17 @@ const App = () => (
                 </ProtectedRoute>
               } 
             />
+            <Route 
+              path="/company-intake" 
+              element={
+                <ProtectedRoute>
+                  <CompanyIntake />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Catch-all routes */}
+            <Route path="/verify" element={<AuthRedirect />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

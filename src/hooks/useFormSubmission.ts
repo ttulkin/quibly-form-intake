@@ -25,11 +25,14 @@ export const useFormSubmission = () => {
         throw new Error("Form validation failed");
       }
       
-      // First send magic link to user
+      console.log(`Sending magic link to: ${formData.workEmail}`);
+      console.log(`Current origin for redirect: ${window.location.origin}`);
+      
+      // Send magic link to user
       const { error: authError } = await supabase.auth.signInWithOtp({
         email: formData.workEmail,
         options: {
-          emailRedirectTo: window.location.origin, // Removed trailing slash for consistency
+          emailRedirectTo: window.location.origin, // Consistent format with LoginForm
         },
       });
 
@@ -70,7 +73,6 @@ export const useFormSubmission = () => {
         // If the request was successfully inserted, try to insert the developer roles
         if (insertedRequestData && insertedRequestData.length > 0) {
           const requestId = insertedRequestData[0].id;
-          const profileId = insertedRequestData[0].profile_id;
 
           // Map developer roles to the format for insertion
           const developerRolesToInsert = formData.developerRoles.map(role => ({

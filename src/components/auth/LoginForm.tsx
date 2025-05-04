@@ -1,26 +1,43 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "./AuthProvider";
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Check if user is already logged in
+  useEffect(() => {
+    if (user) {
+      console.log("User already authenticated, redirecting to dashboard");
+      navigate("/");
+    }
+  }, [user, navigate]);
+  
+  // Extract the redirect destination from location state
+  const from = location.state?.from || "/";
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    console.log("Sending magic link to:", email);
+    console.log(`Sending magic link to: ${email}`);
+    console.log(`Current origin: ${window.location.origin}`);
 
     try {
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: window.location.origin, // Exact URL without trailing slash
+          emailRedirectTo: window.location.origin,
         },
       });
 

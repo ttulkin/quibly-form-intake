@@ -21,17 +21,19 @@ const Dashboard = () => {
     });
 
     // Only redirect when we're sure profile loading is complete
-    if (!loading && !profileLoading && profile) {
+    if (!loading && !profileLoading) {
       // If profile exists with a specific type, redirect to the appropriate dashboard
-      const userType = profile.user_type;
-      console.log("Dashboard: Redirecting to type-specific dashboard", { userType });
-      
-      if (userType === "company") {
-        navigate("/dashboard/company", { replace: true });
-      } else if (userType === "candidate") {
-        navigate("/dashboard/candidate", { replace: true });
-      } else if (userType === "admin") {
-        navigate("/dashboard/admin", { replace: true });
+      if (profile) {
+        const userType = profile.user_type;
+        console.log("Dashboard: Redirecting to type-specific dashboard", { userType });
+        
+        if (userType === "company") {
+          navigate("/dashboard/company", { replace: true });
+        } else if (userType === "candidate") {
+          navigate("/dashboard/candidate", { replace: true });
+        } else if (userType === "admin") {
+          navigate("/dashboard/admin", { replace: true });
+        }
       }
     }
   }, [profile, loading, profileLoading, navigate]);

@@ -21,8 +21,8 @@ const RootRedirect = () => {
 
   useEffect(() => {
     // Wait until both auth loading and profile loading finish
-    if (loading || profileLoading) {
-      console.log("RootRedirect: Still loading", { 
+    if (loading) {
+      console.log("RootRedirect: Auth still loading", { 
         authLoading: loading, 
         profileLoading,
         hasUser: !!user,
@@ -32,9 +32,14 @@ const RootRedirect = () => {
       return;
     }
     
+    // If user is authenticated but profile is still loading, wait
+    if (user && profileLoading) {
+      console.log("RootRedirect: User authenticated, waiting for profile");
+      return;
+    }
+    
     // Prevent multiple redirects
     if (redirectAttempted) return;
-    setRedirectAttempted(true);
     
     console.log("RootRedirect: Handling navigation", { 
       isAuthenticated: !!user,
@@ -44,6 +49,9 @@ const RootRedirect = () => {
       path: window.location.pathname,
       currentLocation: location.pathname
     });
+    
+    // Mark that we've attempted redirection
+    setRedirectAttempted(true);
     
     if (!user) {
       console.log("User not authenticated, redirecting to login");
@@ -63,8 +71,7 @@ const RootRedirect = () => {
       });
     }
     
-    // We now know profileLoading is false at this point
-    // If profile doesn't exist, redirect to generic dashboard which will handle onboarding flow
+    // If auth is loaded but profile doesn't exist, redirect to generic dashboard
     if (!profile) {
       console.log("User authenticated but no profile found, redirecting to generic dashboard");
       navigate("/dashboard", { replace: true });

@@ -17,7 +17,7 @@ type AuthContextType = {
   user: User | null;
   profile: UserProfile | null;
   loading: boolean;
-  profileLoading: boolean; // Added profileLoading state
+  profileLoading: boolean;
   signOut: () => Promise<void>;
 };
 
@@ -28,12 +28,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [profileLoading, setProfileLoading] = useState(false); // Added profileLoading state
+  const [profileLoading, setProfileLoading] = useState(false);
   const { toast } = useToast();
 
-  // Consolidated profile fetching function with additional logging
-  const safeLoadProfile = async (userId: string) => {
-    console.log(`Loading profile for user: ${userId}, setting profileLoading=true`);
+  // Consolidated profile fetching function with error handling and retries
+  const safeLoadProfile = async (userId: string, retryCount = 0) => {
+    console.log(`Loading profile for user: ${userId}, setting profileLoading=true, retry=${retryCount}`);
     setProfileLoading(true);
     
     try {
@@ -45,7 +45,34 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       if (error) {
         console.error('Error fetching user profile:', error);
-        setProfile(null);
+        
+        // For new users, try to create profile if it doesn't exist
+        if (error.code === 'PGRST116' && retryCount < 1) {
+          console.log("Profile not found, attempting to create one");
+          try {
+            // Create a default company profile
+            const { error: insertError } = await supabase
+              .from("profiles")
+              .insert({ 
+                id: userId,
+                user_type: "company" 
+              });
+            
+            if (insertError) {
+              console.error("Error creating profile:", insertError);
+              setProfile(null);
+            } else {
+              // Try to fetch the profile again after creating it
+              console.log("Default profile created, fetching again");
+              return safeLoadProfile(userId, retryCount + 1);
+            }
+          } catch (createError) {
+            console.error("Exception creating profile:", createError);
+            setProfile(null);
+          }
+        } else {
+          setProfile(null);
+        }
       } else if (!data) {
         console.log("No profile found for user ID:", userId);
         setProfile(null);
@@ -78,7 +105,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           console.log(`User authenticated: ${currentSession.user.email}`);
           
           // Use a timeout to avoid potential deadlocks with Supabase client
-          // Increase timeout to ensure it doesn't interfere with initial loading
           setTimeout(async () => {
             await safeLoadProfile(currentSession.user.id);
             setLoading(false);

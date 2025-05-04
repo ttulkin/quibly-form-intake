@@ -12,19 +12,21 @@ import { useState } from "react";
  */
 const CompanyDashboard = () => {
   const [activeTab, setActiveTab] = useState<"requests" | "contractors">("requests");
-  const { profile, profileLoading, user } = useAuth();
+  const { profile, profileLoading, user, loading } = useAuth();
   const navigate = useNavigate();
   
   useEffect(() => {
     console.log("CompanyDashboard: Checking profile", { 
       hasProfile: !!profile, 
-      profileLoading, 
+      profileLoading,
+      loading,
       userType: profile?.user_type,
       userId: user?.id
     });
     
-    // Wait for profile loading to complete
-    if (profileLoading) {
+    // Wait for auth and profile loading to complete
+    if (loading || profileLoading) {
+      console.log("CompanyDashboard: Still loading auth or profile");
       return;
     }
     
@@ -37,13 +39,13 @@ const CompanyDashboard = () => {
     
     // Ensure user has the correct role
     if (profile.user_type !== "company") {
-      console.log("CompanyDashboard: User is not a company, redirecting to root");
+      console.log(`CompanyDashboard: User is not a company (${profile.user_type}), redirecting to root`);
       navigate("/", { replace: true });
     }
-  }, [profile, profileLoading, navigate, user]);
+  }, [profile, profileLoading, loading, navigate, user]);
 
   // Don't render content until profile is loaded and confirmed to be company type
-  if (profileLoading || !profile || profile.user_type !== "company") {
+  if (loading || profileLoading || !profile || profile.user_type !== "company") {
     return (
       <DashboardLayout>
         <div className="flex items-center justify-center min-h-[50vh]">

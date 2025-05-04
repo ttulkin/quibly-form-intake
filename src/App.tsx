@@ -12,7 +12,6 @@ import Login from "./pages/Login";
 import CompanyIntake from "./pages/CompanyIntake";
 import CandidateIntake from "./pages/CandidateIntake";
 import NotFound from "./pages/NotFound";
-import Index from "./pages/Index";
 import AuthRedirect from "./components/routing/AuthRedirect";
 
 // Dashboard components
@@ -43,7 +42,7 @@ const App = () => (
             
             {/* Public routes - accessible without authentication */}
             <Route path="/login" element={<Login />} />
-            <Route path="/form" element={<Index />} />
+            {/* Removed the redundant /form route */}
             <Route path="/company-intake" element={<CompanyIntake />} />
             <Route path="/candidate-intake" element={<CandidateIntake />} />
             

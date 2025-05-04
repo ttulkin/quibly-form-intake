@@ -31,10 +31,10 @@ const NotFound = () => {
           
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button asChild>
-              <Link to="/dashboard">Go to Dashboard</Link>
+              <Link to="/">Go to Dashboard</Link>
             </Button>
             <Button variant="outline" asChild>
-              <Link to="/">Return to Home</Link>
+              <Link to="/company-intake">Submit Request</Link>
             </Button>
           </div>
         </div>

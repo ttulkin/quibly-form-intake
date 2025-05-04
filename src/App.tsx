@@ -6,9 +6,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./components/auth/AuthProvider";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
-import Index from "./pages/Index";
-import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import Login from "./pages/Login";
+import CompanyIntake from "./pages/CompanyIntake";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -21,10 +21,10 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/company-intake" element={<CompanyIntake />} />
             <Route 
-              path="/dashboard" 
+              path="/" 
               element={
                 <ProtectedRoute>
                   <Dashboard />

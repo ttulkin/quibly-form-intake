@@ -1,5 +1,4 @@
 
-import { useState } from "react";
 import { useAuth } from "../auth/AuthProvider";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -9,9 +8,8 @@ interface DashboardLayoutProps {
 }
 
 const DashboardLayout = ({ children }: DashboardLayoutProps) => {
-  const { signOut } = useAuth();
+  const { signOut, profile } = useAuth();
   const navigate = useNavigate();
-  const [activePage, setActivePage] = useState("requests");
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -20,10 +18,16 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           <div className="flex items-center">
             <h1 
               className="text-2xl font-bold text-gray-900 cursor-pointer" 
-              onClick={() => navigate('/dashboard')}
+              onClick={() => navigate('/')}
             >
               Quibly
             </h1>
+            
+            {profile?.user_type && (
+              <span className="ml-4 px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded">
+                {profile.user_type.charAt(0).toUpperCase() + profile.user_type.slice(1)}
+              </span>
+            )}
           </div>
           <div>
             <Button variant="outline" onClick={() => signOut()}>Sign Out</Button>
@@ -32,27 +36,16 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8 flex justify-between items-center">
-          <div className="flex space-x-4">
+        {profile?.user_type !== 'admin' && (
+          <div className="mb-8 flex justify-between items-center">
+            <div className="flex-1"></div>
             <Button 
-              variant={activePage === "requests" ? "default" : "outline"}
-              onClick={() => setActivePage("requests")}
+              onClick={() => navigate('/company-intake')}
             >
-              Requests
-            </Button>
-            <Button 
-              variant={activePage === "contractors" ? "default" : "outline"}
-              onClick={() => setActivePage("contractors")}
-            >
-              Contractors
+              Submit New Request
             </Button>
           </div>
-          <Button 
-            onClick={() => navigate('/')}
-          >
-            Submit New Request
-          </Button>
-        </div>
+        )}
 
         {children}
       </div>

@@ -1,11 +1,43 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/components/auth/AuthProvider";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import RequestsList from "@/components/dashboard/RequestsList";
 import ContractorsList from "@/components/dashboard/ContractorsList";
+import AdminDashboard from "@/components/dashboard/AdminDashboard";
+import { useToast } from "@/components/ui/use-toast";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState<"requests" | "contractors">("requests");
+  const { profile, loading } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  // If profile is loaded but user is not an admin or company, redirect to login
+  useEffect(() => {
+    if (!loading && profile) {
+      if (profile.user_type === 'candidate') {
+        toast({
+          title: "Candidate Portal Coming Soon",
+          description: "The candidate portal is under development.",
+          variant: "default",
+        });
+      }
+    }
+  }, [profile, loading, navigate, toast]);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+      </div>
+    );
+  }
+
+  if (profile?.user_type === 'admin') {
+    return <AdminDashboard />;
+  }
 
   return (
     <DashboardLayout>
